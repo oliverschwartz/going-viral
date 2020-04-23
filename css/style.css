@@ -1,0 +1,201 @@
+
+html, body {
+    padding: 0;
+    margin: 0;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.selectable {
+    -webkit-touch-callout: text;
+    -webkit-user-select: text;
+    -khtml-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+}
+
+body {
+    font-family:"Lucida Sans Unicode", "Lucida Grande", sans-serif;
+    font-size: 20px;
+    color: #eee;
+    background: #222;
+    margin: 0;
+}
+
+#main_div {
+    margin: 0 auto;
+    max-width: 55em;
+
+    position: absolute;
+}
+#title_div {
+    padding: 30px;
+    position: absolute;
+    z-index: 100;
+}
+#index-div {
+    margin:80px 200px 0px 200px;
+    max-width:900px;
+    text-align: center;
+    align: center;
+}
+#index-table td {
+    align: center;
+    border: 10px solid #222;
+    height:500px;
+    width: 280px;
+    vertical-align: top;
+}
+img.demoplot {
+    max-width: 220px;
+    max-height: 220px;
+}
+img {
+    max-width: 640px;
+    margin-left: 30px;
+}
+
+
+.top {
+    margin: 30px;
+}
+
+img {
+    max-width: 640px;
+    margin-left: 30px;
+}
+
+.assignment {
+    font-size: 100%;
+    color: #ddd;
+}
+
+.image {
+    display:inline;
+}
+
+#loading {
+    position:absolute;
+    top:  200px;
+    left: 200px;
+    font-size:47px;
+    font-weight:bold;
+    font-color:#ddd;
+}
+#alert_div {
+    position:absolute;
+    top:  50px;
+    left: 50px;
+    height:100px;
+    width: 340px;
+    font-size:14px;
+    font-weight:bold;
+    text-align: center;
+    align: center;
+    font-color:#ddd;
+    background-color:#422;
+    border:1px solid #333;
+    -webkit-border-radius: 8px;
+    -moz-border-radius: 8px;
+    border-radius: 8px;
+    display: none;
+
+}
+#result_div {
+    margin: 0 auto;
+    text-align: center;
+    font-color:#FF0;
+}
+
+h1, h2, h3 {
+    font-weight: 700;
+    margin: 0em 0em 0em;
+    letter-spacing: 2px;
+    opacity: 0.5;
+    text-shadow:
+       -1px -1px 1px #000,
+        1px -1px 1px #000,
+        -1px 1px 1px #000,
+         1px 1px 1px #000;
+}
+
+h1 {
+    font-size: 100%;
+}
+h2 {
+    margin-top:10px;
+    font-size: 70%;
+}
+h3 {
+    font-size: 60%;
+}
+
+a, a:visited, a:active {
+    text-decoration: none;
+    color: #8CE;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+button {
+    font-family:"Lucida Sans Unicode", "Lucida Grande", sans-serif;
+    font-size: 14px;
+    color: #eee;
+    background: #222;
+    text-align:center;
+    margin:auto auto auto auto;
+    border:1px solid #c4c5c6;  -webkit-border-radius: 8px; -moz-border-radius: 8px;border-radius: 8px;
+    text-shadow: 1px 1px 0 rgba(255,255,255,0.3);
+    background-color: #f2f5f6; background-image: -webkit-gradient(linear, left top, left bottom, from(#333), to(#222));
+    background-image: -webkit-linear-gradient(top, #333, #222);
+    background-image: -moz-linear-gradient(top, #333, #222);
+    background-image: -ms-linear-gradient(top, #333, #222);
+    background-image: -o-linear-gradient(top, #333, #222);
+    background-image: linear-gradient(to bottom, #333, #222);
+    filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#333, endColorstr=#222);
+}
+
+/* https://codepen.io/aeewhite/pen/BjzbOL */
+#recIcon.Rec{
+	animation-name: pulse;
+	animation-duration: 1.5s;
+	animation-iteration-count: infinite;
+	animation-timing-function: linear;
+}
+
+#recIcon.notRec{
+	background-color: darkred;
+}
+
+#recIcon {
+	width: 30px;
+	height: 30px;
+  margin: 0px;
+	font-size: 0;
+	background-color: red;
+	border: 0;
+	border-radius: 35px;
+	outline: none;
+  position: fixed;
+  left: 95px;
+  top: 15px;
+}
+
+@keyframes pulse{
+	0%{
+		box-shadow: 0px 0px 5px 0px rgba(173,0,0,.3);
+	}
+	65%{
+		box-shadow: 0px 0px 5px 13px rgba(173,0,0,.3);
+	}
+	90%{
+		box-shadow: 0px 0px 5px 13px rgba(173,0,0,0);
+	}
+}

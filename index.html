@@ -1,0 +1,114 @@
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>COS426 Assignment 5 &mdash; Cloth Simulation</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link href="css/style.css" type="text/css" rel="stylesheet"/>
+    <style>
+			body {
+				font-family: Monospace;
+        font-size: 16px;
+				background-color: #000;
+				color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+        font-size: 24px;
+				position: absolute;
+				padding: 10px;
+				width: 100%;
+				text-align: center;
+			}
+
+      #writeup {
+        font-size: 16px;
+      }
+
+			#corner {
+				position: absolute;
+				padding: 10px;
+				bottom: 0;
+				right: 0;
+				width: 100%;
+				text-align: right;
+			}
+
+			a {
+				text-decoration: underline;
+				cursor: pointer;
+			}
+
+			#stats { position: absolute; top:0; left: 0 }
+			#stats #fps { background: transparent !important }
+			#stats #fps #fpsText { color: #aaa !important }
+			#stats #fps #fpsGraph { display: true }
+		</style>
+	</head>
+
+	<body>
+    <script src="libjs/three.min.js"></script>
+		<script src="libjs/Detector.js"></script>
+		<script src="libjs/TrackballControls.js"></script>
+		<script src="libjs/OrbitControls.js"></script>
+		<script src="libjs/stats.min.js"></script>
+		<script src="libjs/dat.gui.min.js"></script>
+		<script src="libjs/CanvasRecorder.js"></script>
+		<script src="libjs/CCapture.all.min.js"></script>
+
+
+    <div id="info">COS426 Assignment 5 &mdash; Cloth Simulation<br>
+      <div id="writeup">
+        <p id="student">Student<p>
+        <p>Switch to: <a href='writeup.html'>Writeup</a></p>
+      </div>
+			<!--<a onclick="Sim.restartCloth();">Restart</a>-->
+		</div>
+    <div id="alert_div" title="alert"> </div>
+		<div id="recIcon" class="notRec"></div>
+
+    <script type="x-shader/x-fragment" id="fragmentShaderDepth">
+			uniform sampler2D texture;
+			varying vec2 vUV;
+
+			vec4 pack_depth( const in float depth ) {
+				const vec4 bit_shift = vec4( 256.0 * 256.0 * 256.0, 256.0 * 256.0, 256.0, 1.0 );
+				const vec4 bit_mask  = vec4( 0.0, 1.0 / 256.0, 1.0 / 256.0, 1.0 / 256.0 );
+				vec4 res = fract( depth * bit_shift );
+				res -= res.xxyz * bit_mask;
+				return res;
+			}
+
+			void main() {
+				vec4 pixel = texture2D( texture, vUV );
+				if ( pixel.a < 0.5 ) discard;
+				gl_FragData[ 0 ] = pack_depth( gl_FragCoord.z );
+			}
+		</script>
+
+		<script type="x-shader/x-vertex" id="vertexShaderDepth">
+			varying vec2 vUV;
+
+			void main() {
+				vUV = 0.75 * uv;
+				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+				gl_Position = projectionMatrix * mvPosition;
+			}
+		</script>
+
+		<script src="coursejs/params.js"></script>
+		<script src="coursejs/scene.js"></script>
+
+		<script src="js/student.js"> </script>
+		<script src="js/particle.js"></script>
+		<script src="js/cloth.js"></script>
+
+		<script src="coursejs/sim.js"> </script>
+		<script src="coursejs/guiConfig.js"></script>
+		<script src="coursejs/gui.js"> </script>
+    <script src="coursejs/renderer.js"></script>
+	</body>
+</html>
