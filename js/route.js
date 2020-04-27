@@ -11,11 +11,12 @@ class Route {
     }
 }
 
-Route.prototype.addSection = function(direction, distance) {
+Route.prototype.addSection = function(direction, distance, increment) {
     this.sections.push(
         {
             direction: direction.clone().normalize(),
-            distance: distance
+            distance: distance,
+            increment: increment
         }
     );
 }

@@ -24,7 +24,6 @@ Items.prototype.move = function(id, direction, distance) {
     out of position. 
 */
 Items.prototype.update = function() {
-    let increment = 1; 
 
     // Iterate over each block. 
     for (let i = 0; i < this.count; i++) {
@@ -40,8 +39,8 @@ Items.prototype.update = function() {
             // Move along the first section of the route. 
             let section = route.sections[0]; 
             let direction = section.direction.clone().normalize(); 
-            block.translateOnAxis(direction, increment); 
-            section.distance -= increment;  
+            block.translateOnAxis(direction, section.increment); 
+            section.distance -= section.increment;  
                 
             // This section of the route is done. 
             if (section.distance <= 0) {
@@ -106,7 +105,18 @@ Items.prototype.shuffle = function() {
 
         // Second, compute the routes for every block to its new position.
         let route = new Route();
-        route.addSection(travel.clone().normalize(), travel.length()); 
+        let offset = 10;
+        let scale = 15;
+        let dist = offset + scale * index;
+
+        // Upward section.
+        route.addSection(new THREE.Vector3(0,1,0), dist, dist * 10 ** -1.5);
+
+        // Lateral section.
+        route.addSection(travel.clone().normalize(), travel.length(), travel.length() * 10 ** -1.5); 
+
+        // Downward section.
+        route.addSection(new THREE.Vector3(0,-1,0), dist, dist * 10 ** -1.5);
         items.routes[index] = route;
 
         console.log(indices);
