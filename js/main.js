@@ -1,4 +1,4 @@
-var scene, camera, renderer, gui, blocks; 
+var scene, camera, renderer, gui, items; 
 
 function init() {
 
@@ -14,29 +14,37 @@ function init() {
     // Add some lighting. 
     scene.add(new THREE.AmbientLight(0xffffff));
 
-    // Some parameters about our blocks. 
-    blocks = [];
-    let numBlocks = 10;
-    let size = 50; 
-    let centering = -numBlocks * size
+    // Create our blocks.
+    var createBlocks = function(numBlocks, size) {
+        let blocks = [];
+        let centering = -numBlocks * size
 
-    // Create our blocks. 
-    for (let i = 0; i < numBlocks; i++) {
-        cube = new THREE.Mesh(
-            new THREE.BoxGeometry(size, size, size), 
-            new THREE.MeshBasicMaterial({color: 0x990033})
-        );
-        scene.add(cube);
+        for (let i = 0; i < numBlocks; i++) {
+            cube = new THREE.Mesh(
+                new THREE.BoxGeometry(size, size, size), 
+                new THREE.MeshBasicMaterial({color: 0x990033})
+            );
+            scene.add(cube);
+            blocks.push(cube);
+        
+            // Add mesh on the cube. 
+            var geo = new THREE.EdgesGeometry(cube.geometry);
+            var mat = new THREE.LineBasicMaterial({color: 0xffffff, linewidth: 2});
+            var wireframe = new THREE.LineSegments(geo, mat);
+            cube.add(wireframe);
     
-        // Add mesh on the cube. 
-        var geo = new THREE.EdgesGeometry(cube.geometry);
-        var mat = new THREE.LineBasicMaterial({color: 0xffffff, linewidth: 2});
-        var wireframe = new THREE.LineSegments(geo, mat);
-        cube.add(wireframe);
+            cube.translateX(i * size * 2 + centering);
+        }
 
-        cube.translateX(i * size * 2 + centering);
+        // Instantiate our Items. 
+        items = new Items(blocks); 
     }
 
+    // Some parameters about our blocks. 
+    let numBlocks = 20; 
+    let size = 10;
+    createBlocks(numBlocks, size)
+    
     // Create the ground, adding a texture to it.
     var loader = new THREE.TextureLoader();
     var groundTexture = loader.load( 'textures/grasslight-big.jpg' );
@@ -67,8 +75,25 @@ function init() {
     var axesHelper = new THREE.AxesHelper(1000);
     scene.add(axesHelper);
 
-    // Add a GUI
+    // Add a GUI with shuffle capability. 
+    var guiObj = function() {
+        this.shuffle = function() {
+            items.shuffle();
+        }
+        this.numOfBlocks = 10;
+        this.reset = function() {
+            if (items.count != this.numOfBlocks) {
+                console.log("here")
+                debugger
+                createBlocks(this.numBlocks, 50);
+            }
+        }
+    }
+    var text = new guiObj();
     gui = new dat.GUI();
+    gui.add(text, 'shuffle');
+    gui.add(text, 'numOfBlocks', 1, 20);
+    gui.add(text, 'reset');
 
     camera.position.set(0, 0, 10);
     controls.update();
@@ -77,9 +102,8 @@ function init() {
 function animate() {
     requestAnimationFrame(animate);
 
-    // Rotate the cube a small amount. 
-    // cube.rotation.x += 0.01;
-    // cube.rotation.y += 0.01;
+    // Update the position of our items. 
+    items.update() 
 
     renderer.render(scene, camera);
 };
