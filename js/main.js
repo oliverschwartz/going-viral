@@ -1,3 +1,8 @@
+/******************************************************
+`main.js`: Javascript file with main initializiation
+           and animation loop. 
+*******************************************************/
+
 var scene, camera, renderer, gui, items; 
 
 function init() {
@@ -81,13 +86,15 @@ function init() {
         this.shuffle = function() {
             items.shuffle();
         }
-        this.numOfBlocks = 10;
+        this.numOfBlocks = 20;
         this.reset = function() {
+            this.numOfBlocks = Math.round(this.numOfBlocks);
             if (items.count != this.numOfBlocks) {
                 for (let i = 0; i < items.count; i++) {
                     scene.remove(items.blocks[i]);
                 }
-                createBlocks(this.numOfBlocks, 50);
+                console.log(this.numOfBlocks);
+                createBlocks(this.numOfBlocks, 10);
             }
         }
     }
