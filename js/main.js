@@ -37,6 +37,7 @@ function init() {
         }
 
         // Instantiate our Items. 
+        console.log("creating new Items");
         items = new Items(blocks); 
     }
 
@@ -83,9 +84,10 @@ function init() {
         this.numOfBlocks = 10;
         this.reset = function() {
             if (items.count != this.numOfBlocks) {
-                console.log("here")
-                debugger
-                createBlocks(this.numBlocks, 50);
+                for (let i = 0; i < items.count; i++) {
+                    scene.remove(items.blocks[i]);
+                }
+                createBlocks(this.numOfBlocks, 50);
             }
         }
     }
