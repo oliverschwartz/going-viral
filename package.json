@@ -1,6 +1,6 @@
 {
-  "name": "lower-case-dashed-name-of-project",
-  "repository": "REPOSITORY-NAME-AS-IT-APPEARS-IN-GITHUB-URL",
+  "name": "give-it-a-name",
+  "repository": "https://github.com/oliverschwartz/graphics",
   "version": "0.1.0",
   "title": "PROJECT TITLE HERE",
   "description": "SHORT DESCRIPTION OF PROJECT HERE. ONE TO TWO SENTENCES MAX",
