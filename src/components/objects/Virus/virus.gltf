@@ -273,7 +273,7 @@
 		{
 			"byteLength" : 1971312,
 			"name" : "virus.bin",
-			"uri" : "~/workspace/graphics/src/components/objects/Virus/virus.bin"
+			"uri" : "src/components/objects/Virus/virus.bin"
 		}
 	],
 	"materials" : 
