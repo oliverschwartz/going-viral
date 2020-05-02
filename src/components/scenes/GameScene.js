@@ -36,7 +36,7 @@ class GameScene extends Scene {
         this.state = {
             gui: new Dat.GUI(), // Create GUI for scene
             rotationSpeed: 1,
-            rotation: false,
+            rotation: true,
             updateList: [],
         };
 
@@ -53,13 +53,14 @@ class GameScene extends Scene {
 
         // Populate GUI
         this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
-        this.state.gui.add(this.state, 'rotation')
+        this.state.gui.add(this.state, 'rotation', false, true)
     }
 
     addToUpdateList(object) {
         this.state.updateList.push(object);
     }
 
+    // Called every timestamp.
     update(timeStamp) {
         const { rotationSpeed, updateList } = this.state;
         this.rotation.y = (rotationSpeed * timeStamp) / 10000;
@@ -68,6 +69,8 @@ class GameScene extends Scene {
         for (const obj of updateList) {
             obj.update(timeStamp);
         }
+
+        // Check whether we need to move the virus. 
     }
 }
 
