@@ -4,11 +4,12 @@ class Arena extends Group {
     constructor(parent) {
         // Call parent Group() constructor
         super();
-
-        // const loader = new GLTFLoader();
-        const colors = parent.Colors;
         this.name = 'arena';
 
+        // Inherit a series of colours from the GameScene. 
+        const colors = parent.Colors;
+
+        // Hard-code some parameters of the arena. 
         this.height = 50;
         this.width = 75;
         this.wallSize = 5; 
@@ -18,23 +19,30 @@ class Arena extends Group {
         this.tileColors = [];
         this.floor = [];
 
+        // Define the geometry of a floor tile.
         const geo = new BoxGeometry(this.tileSize, this.tileSize/2,
             this.tileSize);
 
-        
-        for (let x = -this.width; x < this.width + 1; x += this.tileSize) {
-            for (let z = -this.height; z < this.height + 1; z += this.tileSize) {
-
-                const mat = new MeshPhongMaterial({color: new Color(Math.random() * 0xffffff),
-                    flatShading: true});
+        // Create all the floor tiles (BoxGeometries).
+        for (let x = -this.width / 2; x <= this.width / 2; x += this.tileSize) {
+            for (let z = -this.height / 2; z <= this.height / 2; z += this.tileSize) {
+                
+                // Create the box. 
+                const mat = new MeshPhongMaterial({
+                    color: new Color(Math.random() * 0xffffff),
+                    flatShading: true
+                });
                 const mesh = new Mesh(geo, mat);
+
+                // Update its position; add it to the scene. 
                 mesh.position.set(x,  -this.tileSize / 4, z);
                 this.floor.push(mesh);
-                this.tileColors.push(0);
-                // gameScene.add(mesh);
+                // this.tileColors.push(0); // What is this line doing? 
                 this.add(mesh);
             }
         }
+
+        // Create all the wall tiles. 
 
         
         
