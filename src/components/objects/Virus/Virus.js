@@ -1,6 +1,6 @@
 import { Group, Vector3 } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { DoubleSide, Mesh } from 'three';
+import { DoubleSide, Mesh, SphereGeometry, MeshPhongMaterial, Color } from 'three';
 import MODEL from './virus.gltf';
 
 class Virus extends Group {
@@ -14,30 +14,16 @@ class Virus extends Group {
             gui: parent.state.gui,
             rotate: true,
         };
-
-        // Load object
-        const loader = new GLTFLoader();
-        loader.load(MODEL, (gltf) => {
-
-            gltf.scene.traverse( function( node ) {
-                if ( node instanceof Mesh ) { 
-                  node.castShadow = true; 
-                  node.material.side = DoubleSide;
-                  node.geometry.center();
-                  node.rotation.set(0,0,0);
-                }
-            });
-
-            gltf.scene.rotation.set(0,0,0);
-
-            this.add(gltf.scene);
-            // let children = gltf.scene.children; 
-            // for (let i = 0; i < children.length; i++) {
-                // let child = children[i];
-                // this.add(child)
-                // child.position.set(0,0,0);
-            // }
+        
+        const geo = new  SphereGeometry(1, 32, 32); 
+        const mat = new MeshPhongMaterial({
+            color: new Color(0xffffff * Math.random()), 
+            flatShading: false,
+            wireframe: true,
         });
+        const mesh = new Mesh(geo, mat);
+        this.add(mesh);
+        mesh.position.set(0,2,0);
 
         // Add self to parent's update list
         parent.addToUpdateList(this);
@@ -46,8 +32,8 @@ class Virus extends Group {
     update(timeStamp) {
         if (this.state.rotate) {
             // Bob back and forth
-            this.rotation.x += 0.01;
-            this.rotation.y += 0.01
+            this.children[0].rotation.x += 0.01;
+            this.children[0].rotation.y += 0.01
         }
     }
 }
