@@ -2,6 +2,7 @@ import * as Dat from 'dat.gui';
 import { Scene, Color, Vector3 } from 'three';
 import { Flower, Arena } from 'objects';
 import { BasicLights } from 'lights';
+import { Virus } from '../objects/Virus';
 
 const Colors = {
     background: 0x000000,
@@ -35,6 +36,7 @@ class GameScene extends Scene {
         this.state = {
             gui: new Dat.GUI(), // Create GUI for scene
             rotationSpeed: 1,
+            rotation: false,
             updateList: [],
         };
 
@@ -44,12 +46,14 @@ class GameScene extends Scene {
 
         // Add meshes to scene
         const arena = new Arena(this);
+        const virus = new Virus(this); 
         const flower = new Flower(this);
         const lights = new BasicLights();
-        this.add(arena, flower, lights);
+        this.add(arena, virus, flower, lights);
 
         // Populate GUI
         this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
+        this.state.gui.add(this.state, 'rotation')
     }
 
     addToUpdateList(object) {
