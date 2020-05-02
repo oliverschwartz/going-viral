@@ -116,8 +116,8 @@
 	[
 		{
 			"byteLength" : 168308,
-			"name" : "flower",
-			"uri" : "flower.bin"
+			"name" : "flower.bin",
+			"uri" : "src/components/objects/Flower/flower.bin"
 		}
 	],
 	"materials" : 

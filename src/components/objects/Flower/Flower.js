@@ -1,7 +1,7 @@
 import { Group } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { TWEEN } from 'three/examples/jsm/libs/tween.module.min.js';
-// import MODEL from './flowerOG.gltf';
+import MODEL from './flower.gltf';
 
 class Flower extends Group {
     constructor(parent) {
@@ -20,7 +20,7 @@ class Flower extends Group {
         const loader = new GLTFLoader();
 
         this.name = 'flower';
-        loader.load('./flower.glb', (gltf) => {
+        loader.load(MODEL, (gltf) => {
             this.add(gltf.scene);
         });
 
