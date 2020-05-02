@@ -20,8 +20,7 @@ class Arena extends Group {
         this.floor = [];
 
         // Define the geometry of a floor tile.
-        const geo = new BoxGeometry(this.tileSize, this.tileSize/2,
-            this.tileSize);
+        const geo = new BoxGeometry(this.tileSize, this.tileSize, this.tileSize);
 
         // Create all the floor tiles (BoxGeometries).
         for (let x = -this.width / 2; x <= this.width / 2; x += this.tileSize) {
@@ -35,17 +34,40 @@ class Arena extends Group {
                 const mesh = new Mesh(geo, mat);
 
                 // Update its position; add it to the scene. 
-                mesh.position.set(x,  -this.tileSize / 4, z);
+                mesh.position.set(x,  -this.tileSize / 2, z);
                 this.floor.push(mesh);
                 // this.tileColors.push(0); // What is this line doing? 
                 this.add(mesh);
             }
         }
 
-        // Create all the wall tiles. 
+        // Create all the wall tiles along one pair of sides. 
+        let x = -this.width / 2 - this.tileSize; 
+        for (let z = -this.height / 2 - this.tileSize; z <= this.height / 2 + this.tileSize; z += this.tileSize) {
+            const mat = new MeshPhongMaterial({
+                color: new Color(0xffffff * Math.random()),
+                flatShading: true
+            });
+            const mesh = new Mesh(geo, mat);
+            let clone = mesh.clone()
+            mesh.position.set(x, this.tileSize / 2, z);
+            clone.position.set(-x, this.tileSize / 2, z);
+            this.add(mesh, clone)
+        }
 
-        
-        
+        // Create all the wall tiles along the remaining pair of sides. 
+        let z = -this.height / 2 - this.tileSize; 
+        for (let x = -this.width / 2 - this.tileSize; x <= this.width / 2 + this.tileSize; x += this.tileSize) {
+            const mat = new MeshPhongMaterial({
+                color: new Color(0xffffff * Math.random()),
+                flatShading: true
+            });
+            const mesh = new Mesh(geo, mat);
+            let clone = mesh.clone()
+            mesh.position.set(x, this.tileSize / 2, z);
+            clone.position.set(x, this.tileSize / 2, -z);
+            this.add(mesh, clone)
+        }
     }
 
     // update Land to color based on player positions 
