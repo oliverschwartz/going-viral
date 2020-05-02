@@ -1,15 +1,13 @@
 import { Color, Group, MeshPhongMaterial, BoxGeometry, PlaneGeometry, MeshBasicMaterial, Mesh, DoubleSide } from 'three';
-// import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-// import MODEL from './land.gltf';
 
-class Land extends Group {
+class Arena extends Group {
     constructor(parent) {
         // Call parent Group() constructor
         super();
 
         // const loader = new GLTFLoader();
         const colors = parent.Colors;
-        this.name = 'land';
+        this.name = 'arena';
 
         this.height = 50;
         this.width = 75;
@@ -59,4 +57,4 @@ class Land extends Group {
     }
 }
 
-export default Land;
+export default Arena;
