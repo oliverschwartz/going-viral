@@ -26,7 +26,7 @@ const   X_AXIS = new Vector3(1, 0, 0),
         maxPowers = 5,
         powerProb = 0.975;
 
-class SeedScene extends Scene {
+class GameScene extends Scene {
     constructor() {
         // Call parent Scene() constructor
         super();
@@ -67,4 +67,4 @@ class SeedScene extends Scene {
     }
 }
 
-export default SeedScene;
+export default GameScene;
