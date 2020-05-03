@@ -37,7 +37,7 @@ class Virus extends Group {
         this.state.mesh.position.set(this.state.position.x,this.state.position.y,this.state.position.z);
 
         // Register event listeners. 
-        function addKeyDownHandler(elem, keys) {
+        function addKeyDownHandler(elem, keys) { // If a key is released. 
             elem.addEventListener('keydown', function(e) {
                 if (e.key === "ArrowUp") {
                     keys[0] = 1;
@@ -53,7 +53,7 @@ class Virus extends Group {
                 }
             }, false);
         }
-        function addKeyUpHandler(elem, keys) {
+        function addKeyUpHandler(elem, keys) { // If a key is pressed. 
             elem.addEventListener('keyup', function(e) {
                 if (e.key === "ArrowUp") {
                     keys[0] = 0;
@@ -88,6 +88,7 @@ class Virus extends Group {
         const speed = 0.5;
         const angle = 3 * Math.PI / 180; 
 
+        // Iterate over the arrow keys. If any are pressed, either rotate the camera or move the virus. 
         for (let i = 0; i < this.state.keys.length; i++) {
             if (this.state.keys[i] === 1) {
                 let translation, x, z;
