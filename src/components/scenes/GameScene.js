@@ -30,7 +30,7 @@ const   X_AXIS = new Vector3(1, 0, 0),
 let arena, initialPosVirus, initialDirVirus, virus, flower
 
 class GameScene extends Scene {
-    constructor() {
+    constructor(camera) {
         // Call parent Scene() constructor
         super();
 
@@ -43,6 +43,7 @@ class GameScene extends Scene {
         };
 
         this.Colors = Colors;
+        this.camera = camera; 
         // Set background to a nice color
         this.background = new Color(0x7ec0ee);
 
@@ -72,7 +73,7 @@ class GameScene extends Scene {
     }
 
     // Called every timestamp.
-    update(timeStamp) {
+    update(timeStamp, camera) {
         const { rotationSpeed, updateList } = this.state;
         this.rotation.y = (rotationSpeed * timeStamp) / 10000;
 

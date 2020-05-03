@@ -1,6 +1,5 @@
-import { Group, Vector3 } from 'three';
+import { Group, Vector3, DoubleSide, Mesh, SphereGeometry, MeshPhongMaterial, Color } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { DoubleSide, Mesh, SphereGeometry, MeshPhongMaterial, Color } from 'three';
 import MODEL from './virus.gltf';
 
 class Virus extends Group {
@@ -84,21 +83,31 @@ class Virus extends Group {
         }
 
         let currPosition = this.children[0].position; 
+        let target = new Vector3( 0, 0, -1 );
+        target.applyQuaternion( this.parent.camera.quaternion );
 
         for (let i = 0; i < this.state.keys.length; i++) {
             if (this.state.keys[i] === 1) {
                 switch (i) {
                     case 0:
                         this.children[0].position.x -= 0.1;
+                        this.parent.camera.position.x -= 0.1;
+                        this.parent.camera.lookAt(this.children[0].position);
                         break;
                     case 1:
                         this.children[0].position.x += 0.1;
+                        this.parent.camera.position.x += 0.1;
+                        this.parent.camera.lookAt(this.children[0].position);
                         break;
                     case 2:
                         this.children[0].position.z -= 0.1;
+                        this.parent.camera.position.z -= 0.1;
+                        this.parent.camera.lookAt(this.children[0].position);
                         break;
                     case 3:
                         this.children[0].position.z += 0.1;
+                        this.parent.camera.position.z += 0.1;
+                        this.parent.camera.lookAt(this.children[0].position);
                         break;
                 }
             }
