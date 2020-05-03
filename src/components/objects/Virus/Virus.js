@@ -4,7 +4,7 @@ import { DoubleSide, Mesh, SphereGeometry, MeshPhongMaterial, Color } from 'thre
 import MODEL from './virus.gltf';
 
 class Virus extends Group {
-    constructor(parent) {
+    constructor(parent, position, direction) {
         // Call parent Group() constructor
         super();
         this.name = 'virus';
@@ -13,6 +13,17 @@ class Virus extends Group {
         this.state = {
             gui: parent.state.gui,
             rotate: true,
+            position: position,
+            prevPosition: position.clone(),
+            direction: direction,
+            score: 0, // number of tiles colored
+            // Define a boolean array to determine where the virus should go. 
+            // Each key corresponds to Left,Up,Right,Down.
+            keys: [0,0,0,0],
+            mesh: undefined,
+            physical: undefined,  
+            canMove: true,
+            freeze: undefined
         };
         
         // Define the sphere. 
@@ -22,13 +33,9 @@ class Virus extends Group {
             flatShading: false,
             wireframe: true,
         });
-        const mesh = new Mesh(geo, mat);
-        this.add(mesh);
-        mesh.position.set(0,2,0);
-
-        // Define a boolean array to determine where the virus should go. 
-        // Each key corresponds to Left,Up,Right,Down.
-        this.keys = [0,0,0,0];
+        this.state.mesh = new Mesh(geo, mat);
+        this.add(this.state.mesh);
+        this.state.mesh.position.set(this.state.position.x,this.state.position.y,this.state.position.z);
 
         // Register event listeners. 
         function addKeyDownHandler(elem, keys) {
@@ -63,8 +70,8 @@ class Virus extends Group {
                 }
             }, false);
         }
-        addKeyDownHandler(window, this.keys);
-        addKeyUpHandler(window, this.keys);
+        addKeyDownHandler(window, this.state.keys);
+        addKeyUpHandler(window, this.state.keys);
 
         // Add self to parent's update list
         parent.addToUpdateList(this);
@@ -78,8 +85,8 @@ class Virus extends Group {
 
         let currPosition = this.children[0].position; 
 
-        for (let i = 0; i < this.keys.length; i++) {
-            if (this.keys[i] === 1) {
+        for (let i = 0; i < this.state.keys.length; i++) {
+            if (this.state.keys[i] === 1) {
                 switch (i) {
                     case 0:
                         this.children[0].position.x -= 0.1;

@@ -27,6 +27,8 @@ const   X_AXIS = new Vector3(1, 0, 0),
         maxPowers = 5,
         powerProb = 0.975;
 
+let arena, initialPosVirus, initialDirVirus, virus, flower
+
 class GameScene extends Scene {
     constructor() {
         // Call parent Scene() constructor
@@ -44,10 +46,19 @@ class GameScene extends Scene {
         // Set background to a nice color
         this.background = new Color(0x7ec0ee);
 
-        // Add meshes to scene
-        const arena = new Arena(this);
-        const virus = new Virus(this); 
-        const flower = new Flower(this);
+        // Add area to scene
+        arena = new Arena(this);
+
+         // Set initial positions and direction of virus
+        // initialPosVirus = new Vector3(-arena.width + 2 * arena.wallSize,
+        //     -arena.height + 2 * arena.wallSize, 0);
+        initialPosVirus = new Vector3(0,2,0);
+        initialDirVirus = new Vector3(1, 0, 0);
+
+        // Add virus to scene 
+        virus = new Virus(this, initialPosVirus.clone(), initialDirVirus.clone()); 
+
+        flower = new Flower(this);
         const lights = new BasicLights();
         this.add(arena, virus, flower, lights);
 
