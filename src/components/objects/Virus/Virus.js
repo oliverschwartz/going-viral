@@ -1,12 +1,21 @@
-import { Group, Vector3, DoubleSide, Mesh, SphereGeometry, MeshPhongMaterial, Color, Euler } from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import MODEL from './virus.gltf';
+import {
+  Group,
+  Vector3,
+  DoubleSide,
+  Mesh,
+  SphereGeometry,
+  MeshPhongMaterial,
+  Color,
+  Euler,
+} from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import MODEL from "./virus.gltf";
 
 class Virus extends Group {
-    constructor(parent, position, direction) {
-        // Call parent Group() constructor
-        super();
-        this.name = 'virus';
+  constructor(parent, position, direction) {
+    // Call parent Group() constructor
+    super();
+    this.name = "virus";
 
         // Init state
         this.state = {
@@ -72,16 +81,60 @@ class Virus extends Group {
         addKeyDownHandler(window, this.state.keys);
         addKeyUpHandler(window, this.state.keys);
 
-        // Add self to parent's update list
-        parent.addToUpdateList(this);
+    // Register event listeners.
+    function addKeyDownHandler(elem, keys) {
+      // If a key is released.
+      elem.addEventListener(
+        "keydown",
+        function (e) {
+          if (e.key === "ArrowUp") {
+            keys[0] = 1;
+          }
+          if (e.key === "ArrowDown") {
+            keys[1] = 1;
+          }
+          if (e.key === "ArrowRight") {
+            keys[2] = 1;
+          }
+          if (e.key === "ArrowLeft") {
+            keys[3] = 1;
+          }
+        },
+        false
+      );
     }
+    function addKeyUpHandler(elem, keys) {
+      // If a key is pressed.
+      elem.addEventListener(
+        "keyup",
+        function (e) {
+          if (e.key === "ArrowUp") {
+            keys[0] = 0;
+          }
+          if (e.key === "ArrowDown") {
+            keys[1] = 0;
+          }
+          if (e.key === "ArrowRight") {
+            keys[2] = 0;
+          }
+          if (e.key === "ArrowLeft") {
+            keys[3] = 0;
+          }
+        },
+        false
+      );
+    }
+    addKeyDownHandler(window, this.state.keys);
+    addKeyUpHandler(window, this.state.keys);
 
-    update(timeStamp) {
-        if (this.state.rotate) {
-            this.children[0].rotation.x += 0.01;
-            this.children[0].rotation.y += 0.01
-        }
-
+    // Add self to parent's update list
+    parent.addToUpdateList(this);
+  }
+  update(timeStamp) {
+    if (this.state.rotate) {
+      this.children[0].rotation.x += 0.01;
+      this.children[0].rotation.y += 0.01;
+    }
         // let mesh = this.children[0];
 
         // Define some movement constants. 
@@ -122,7 +175,16 @@ class Virus extends Group {
                 this.parent.camera.lookAt(this.state.mesh.position.clone())
             }
         }
+
+        // Update the position of the camera.
+        // Update where the camera is looking.
+        this.parent.camera.lookAt(mesh.position.clone());
+
+        // Update the position of the virus
+        // this.state.mesh.position = mesh.position;
+      }
     }
-}
+  
+
 
 export default Virus;
