@@ -35,7 +35,7 @@ class GameScene extends Scene {
         // Init state
         this.state = {
             gui: new Dat.GUI(), // Create GUI for scene
-            rotationSpeed: 1,
+            rotationSpeed: 0,
             rotation: true,
             updateList: [],
         };

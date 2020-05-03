@@ -36,12 +36,30 @@ class Virus extends Group {
                 if (e.key === "ArrowUp") {
                     keys[0] = 1;
                 }
+                if (e.key === "ArrowDown") {
+                    keys[1] = 1;
+                }
+                if (e.key === "ArrowRight") {
+                    keys[2] = 1;
+                }
+                if (e.key === "ArrowLeft") {
+                    keys[3] = 1;
+                }
             }, false);
         }
         function addKeyUpHandler(elem, keys) {
             elem.addEventListener('keyup', function(e) {
                 if (e.key === "ArrowUp") {
                     keys[0] = 0;
+                }
+                if (e.key === "ArrowDown") {
+                    keys[1] = 0;
+                }
+                if (e.key === "ArrowRight") {
+                    keys[2] = 0;
+                }
+                if (e.key === "ArrowLeft") {
+                    keys[3] = 0;
                 }
             }, false);
         }
@@ -64,13 +82,17 @@ class Virus extends Group {
             if (this.keys[i] === 1) {
                 switch (i) {
                     case 0:
-                        this.children[0].position.set(currPosition.x + 0.001, currPosition.y, currPosition.z);
+                        this.children[0].position.x -= 0.1;
+                        break;
                     case 1:
-                        this.children[0].position.z += 1;
+                        this.children[0].position.x += 0.1;
+                        break;
                     case 2:
-                        this.children[0].position.x -= 1;
+                        this.children[0].position.z -= 0.1;
+                        break;
                     case 3:
-                        this.children[0].position.z -= 1;
+                        this.children[0].position.z += 0.1;
+                        break;
                 }
             }
         }
