@@ -14,8 +14,17 @@ function createPhysicsWorld() {
     // world.addBody(ball2.physical);
 }
 
-function updatePhysicsWorld() {
+function resetPhysicsWorld() {
+    virus.physical.position.copy(initialPos);
+    // ball2.physical.position.copy(initialPos2);
 
+    const velocity = new CANNON.Vec3(0, 0, 0);
+    ball1.physical.velocity.copy(velocity);
+    ball2.physical.velocity.copy(velocity);
+}
+
+
+function updatePhysicsWorld() {
     world.step(1 / 60);
 
     // Updates velocity.
@@ -37,3 +46,6 @@ function updatePhysicsWorld() {
     handleWallCollisions(virus.physical);
     // handleWallCollisions(ball2.physical);
 }
+
+
+function handleWallCollisions()
