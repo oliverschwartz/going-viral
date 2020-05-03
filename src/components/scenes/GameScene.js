@@ -54,7 +54,7 @@ class GameScene extends Scene {
         // initialPosVirus = new Vector3(-arena.width + 2 * arena.wallSize,
         //     -arena.height + 2 * arena.wallSize, 0);
         initialPosVirus = new Vector3(0,2,0);
-        initialDirVirus = new Vector3(1, 0, 0);
+        initialDirVirus = new Vector3(-1, 0, 0);
 
         // Add virus to scene 
         virus = new Virus(this, initialPosVirus.clone(), initialDirVirus.clone()); 

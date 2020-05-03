@@ -1,4 +1,4 @@
-import { Group, Vector3, DoubleSide, Mesh, SphereGeometry, MeshPhongMaterial, Color } from 'three';
+import { Group, Vector3, DoubleSide, Mesh, SphereGeometry, MeshPhongMaterial, Color, Euler } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import MODEL from './virus.gltf';
 
@@ -82,34 +82,43 @@ class Virus extends Group {
             this.children[0].rotation.y += 0.01
         }
 
-        let currPosition = this.children[0].position; 
-        let target = new Vector3( 0, 0, -1 );
-        target.applyQuaternion( this.parent.camera.quaternion );
+        let mesh = this.children[0];
+
+        // Define some movement constants. 
+        const speed = 0.5;
+        const angle = 3 * Math.PI / 180; 
 
         for (let i = 0; i < this.state.keys.length; i++) {
             if (this.state.keys[i] === 1) {
+                let translation, x, z;
                 switch (i) {
-                    case 0:
-                        this.children[0].position.x -= 0.1;
-                        this.parent.camera.position.x -= 0.1;
-                        this.parent.camera.lookAt(this.children[0].position);
+                    case 0: // Forward - move the object. 
+                        mesh.position.add(this.state.direction.clone().multiplyScalar(speed));
+                        this.parent.camera.position.add(this.state.direction.clone().multiplyScalar(speed));
                         break;
-                    case 1:
-                        this.children[0].position.x += 0.1;
-                        this.parent.camera.position.x += 0.1;
-                        this.parent.camera.lookAt(this.children[0].position);
+                    case 1: // Backward - move the object.
+                        mesh.position.add(this.state.direction.clone().multiplyScalar(-speed));
+                        this.parent.camera.position.add(this.state.direction.clone().multiplyScalar(-speed));
                         break;
-                    case 2:
-                        this.children[0].position.z -= 0.1;
-                        this.parent.camera.position.z -= 0.1;
-                        this.parent.camera.lookAt(this.children[0].position);
+                    case 2: // Right - rotate the camera. 
+                        this.state.direction.applyEuler(new Euler(0, -angle, 0));
+                        x = this.parent.camera.position.x - mesh.position.x; 
+                        z = this.parent.camera.position.z - mesh.position.z; 
+                        this.parent.camera.position.x = x * Math.cos(angle) - z * Math.sin(angle) + mesh.position.x; 
+                        this.parent.camera.position.z = z * Math.cos(angle) + x * Math.sin(angle) + mesh.position.z; 
                         break;
-                    case 3:
-                        this.children[0].position.z += 0.1;
-                        this.parent.camera.position.z += 0.1;
-                        this.parent.camera.lookAt(this.children[0].position);
+                    case 3: // Left - rotate the camera. 
+                        this.state.direction.applyEuler(new Euler(0, angle, 0));
+                        x = this.parent.camera.position.x - mesh.position.x; 
+                        z = this.parent.camera.position.z - mesh.position.z; 
+                        this.parent.camera.position.x = x * Math.cos(-angle) - z * Math.sin(-angle) + mesh.position.x; 
+                        this.parent.camera.position.z = z * Math.cos(-angle) + x * Math.sin(-angle) + mesh.position.z; 
                         break;
                 }
+
+                // Update the position of the camera. 
+                // Update where the camera is looking. 
+                this.parent.camera.lookAt(mesh.position.clone())
             }
         }
     }

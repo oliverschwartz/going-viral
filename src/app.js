@@ -19,7 +19,7 @@ var axesHelper = new AxesHelper( 5 );
 scene.add( axesHelper );
 
 // Set up camera
-camera.position.set(15, 5, 0);
+camera.position.set(15, 10, 0);
 camera.lookAt(new Vector3(0, 2, 0));
 
 // Set up renderer, canvas, and minor CSS adjustments
