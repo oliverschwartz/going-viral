@@ -102,7 +102,7 @@ class Virus extends Group {
     // Add self to parent's update list
     parent.addToUpdateList(this);
   }
-
+  
   update(timeStamp) {
     // Define some movement constants.
     const speed = 0.2;
@@ -162,7 +162,39 @@ class Virus extends Group {
       }
     }
 
-    // Update the position of the virus.
+    // get new position and update for wall collision
+    var newPosition = this.findNewPosition();
+    newPosition = this.updateForWallCollision(newPosition);
+
+    this.state.position.set(newPosition.x, newPosition.y, newPosition.z);
+
+    var newPosClone = this.state.position.clone();
+    this.state.mesh.position.set(
+      newPosClone.x,
+      newPosClone.y,
+      newPosClone.z
+    );
+
+    // Update the direction the virus is travelling in.
+    this.state.direction = this.state.position
+      .clone()
+      .sub(this.state.prevPosition.clone())
+      .normalize();
+
+    // Update the position of the camera.
+    let translation = this.state.position
+      .clone()
+      .sub(this.state.prevPosition.clone());
+    this.parent.camera.position.add(translation);
+
+    // Update where the camera is looking.
+    this.parent.camera.lookAt(this.state.mesh.position.clone());
+
+    this.addFrictionForce();
+  }    
+
+  // Update the position of the virus w/ Newtonian motion.
+  findNewPosition() {
     let prevPosition = this.state.prevPosition.clone();
     let currPosition = this.state.position.clone();
     this.state.prevPosition = this.state.position.clone();
@@ -173,7 +205,10 @@ class Virus extends Group {
       .clone()
       .add(currPosition.sub(prevPosition).multiplyScalar(1 - damping))
       .add(accel.multiplyScalar(deltaT ** 2));
+    return newPosition;
+  }
 
+  updateForWallCollision(newPosition) {
     // Handle wall collisions.
     const EPS = 0.1;
     if (
@@ -212,30 +247,10 @@ class Virus extends Group {
         this.state.radius -
         EPS;
     }
-
-    this.state.position.set(newPosition.x, newPosition.y, newPosition.z);
-
-    this.state.mesh.position.set(
-      this.state.position.clone().x,
-      this.state.position.clone().y,
-      this.state.position.clone().z
-    );
-
-    // Update the direction the virus is travelling in.
-    this.state.direction = this.state.position
-      .clone()
-      .sub(this.state.prevPosition.clone())
-      .normalize();
-
-    // Update the position of the camera.
-    let translation = this.state.position
-      .clone()
-      .sub(this.state.prevPosition.clone());
-    this.parent.camera.position.add(translation);
-
-    // Update where the camera is looking.
-    this.parent.camera.lookAt(this.state.mesh.position.clone());
-
+    return newPosition;
+  }
+  
+  addFrictionForce() {
     // Add friction to the net-force (proportional to velocity squared).
     const FRICTION = -0.1;
     let v_squared = Math.pow(
