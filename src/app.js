@@ -39,12 +39,12 @@ document.body.style.overflow = "hidden"; // Fix scrolling
 document.body.appendChild(canvas); // add canvas to document body
 
 // // Set up controls
-// const controls = new OrbitControls(camera, canvas);
-// controls.enableDamping = true;
-// controls.enablePan = false;
-// controls.minDistance = 4;
-// controls.maxDistance = 16;
-// controls.update();
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true;
+controls.enablePan = false;
+controls.minDistance = 4;
+controls.maxDistance = 16;
+controls.update();
 
 // Render loop that does the animation
 const onAnimationFrameHandler = (timeStamp) => {

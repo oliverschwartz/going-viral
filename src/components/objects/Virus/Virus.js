@@ -22,6 +22,7 @@ class Virus extends Group {
     // Init state
     this.state = {
       gui: parent.state.gui,
+      parent: parent,
       rotate: true,
       prevPosition: pos.clone(),
       direction: direction,
@@ -29,16 +30,17 @@ class Virus extends Group {
       // Define a boolean array to determine where the virus should go.
       // Each key corresponds to Left,Up,Right,Down.
       keys: [0, 0, 0, 0],
+      radius: 1,
       mesh: undefined,
       mass: 1,
-      netForce: new Vector3(-1, 0, 0),
+      netForce: new Vector3(0, 0, 0),
       physical: undefined,
       canMove: true,
       freeze: undefined,
     };
 
     // Define the sphere.
-    const geo = new SphereGeometry(1, 32, 32);
+    const geo = new SphereGeometry(this.state.radius, 32, 32);
     const mat = new MeshPhongMaterial({
       color: new Color(0xffffff * Math.random()),
       flatShading: false,
@@ -102,11 +104,6 @@ class Virus extends Group {
   }
 
   update(timeStamp) {
-    if (this.state.rotate) {
-      this.children[0].rotation.x += 0.01;
-      this.children[0].rotation.y += 0.01;
-    }
-
     // Define some movement constants.
     const speed = 0.2;
     const angle = (3 * Math.PI) / 180;
@@ -172,9 +169,52 @@ class Virus extends Group {
     let accel = this.state.netForce.clone().multiplyScalar(1 / this.state.mass);
     let deltaT = 0.1;
     let damping = 0.1;
-    this.state.position
+    let newPosition = this.state.position
+      .clone()
       .add(currPosition.sub(prevPosition).multiplyScalar(1 - damping))
       .add(accel.multiplyScalar(deltaT ** 2));
+
+    // Handle wall collisions.
+    const EPS = 0.1;
+    if (
+      // -x wall
+      newPosition.x - this.state.radius - EPS <=
+      -this.state.parent.width / 2
+    ) {
+      newPosition.x = -this.state.parent.width / 2 + this.state.radius + EPS;
+    }
+    if (
+      // -z wall
+      newPosition.z - this.state.radius - EPS <=
+      -this.state.parent.height / 2
+    ) {
+      newPosition.z = -this.state.parent.height / 2 + this.state.radius + EPS;
+    }
+    if (
+      // +x wall
+      newPosition.x + this.state.radius + EPS >=
+      this.state.parent.width / 2 - this.state.parent.tileSize
+    ) {
+      newPosition.x =
+        this.state.parent.width / 2 -
+        this.state.parent.tileSize -
+        this.state.radius -
+        EPS;
+    }
+    if (
+      // +z wall
+      newPosition.z + this.state.radius + EPS >=
+      this.state.parent.height / 2 - this.state.parent.tileSize
+    ) {
+      newPosition.z =
+        this.state.parent.height / 2 -
+        this.state.parent.tileSize -
+        this.state.radius -
+        EPS;
+    }
+
+    this.state.position.set(newPosition.x, newPosition.y, newPosition.z);
+
     this.state.mesh.position.set(
       this.state.position.clone().x,
       this.state.position.clone().y,

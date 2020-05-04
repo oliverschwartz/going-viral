@@ -19,11 +19,12 @@ class Arena extends Group {
     const colors = parent.Colors;
 
     // Hard-code some parameters of the arena.
-    this.height = 50;
-    this.width = 75;
-    this.wallSize = 5;
-    this.wallHeight = 10;
-    this.tileSize = 1;
+    this.parent = parent;
+    this.height = this.parent.height;
+    this.width = this.parent.width;
+    this.wallSize = this.parent.wallSize;
+    this.wallHeight = this.parent.wallHeight;
+    this.tileSize = this.parent.tileSize;
 
     this.tileColors = [];
     this.floor = [];

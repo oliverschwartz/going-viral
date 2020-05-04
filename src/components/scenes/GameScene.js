@@ -61,7 +61,12 @@ class GameScene extends Scene {
 
     console.log("IN GAME SCENE CONSTRUCTOR")
 
-    // Add area to scene
+    // Add area to scene.
+    this.height = 50;
+    this.width = 75;
+    this.wallSize = 5;
+    this.wallHeight = 10;
+    this.tileSize = 1;
     arena = new Arena(this);
 
     flower = new Flower(this);
