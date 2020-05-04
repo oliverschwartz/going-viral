@@ -59,6 +59,8 @@ class GameScene extends Scene {
     virus = new Virus(this, initialPosVirus.clone(), initialDirVirus.clone());
     this.virus = virus;
 
+    console.log("IN GAME SCENE CONSTRUCTOR")
+
     // Add area to scene
     arena = new Arena(this);
 

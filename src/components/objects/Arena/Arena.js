@@ -23,7 +23,7 @@ class Arena extends Group {
     this.width = 75;
     this.wallSize = 5;
     this.wallHeight = 10;
-    this.tileSize = 5;
+    this.tileSize = 1;
 
     this.tileColors = [];
     this.floor = [];
@@ -99,10 +99,9 @@ class Arena extends Group {
   }
 
   index(x, z) {
-    let x_index = Math.round((x + this.width / 2) / this.tileSize); // floor((0  + 37.5) / 5) = 7
-    let z_index = Math.round((z + this.height / 2) / this.tileSize); // floor((0 + 25) / 5) = 5
-    let index = x_index * (this.height / this.tileSize) + z_index; //
-
+    let x_index = Math.round((x + this.width / 2) / this.tileSize);
+    let z_index = Math.round((z + this.height / 2) / this.tileSize);
+    let index = x_index * (this.height / this.tileSize) + z_index;
     return index;
   }
 
