@@ -1,8 +1,7 @@
 import * as Dat from "dat.gui";
 import { Scene, Color, Vector3 } from "three";
-import { Flower, Arena } from "objects";
+import { Flower, Arena, Player, Ball } from "objects";
 import { BasicLights } from "lights";
-import { Virus } from "../objects/Virus";
 
 const Colors = {
   background: 0x000000,
@@ -52,14 +51,17 @@ class GameScene extends Scene {
     // Set initial positions and direction of virus
     // initialPosVirus = new Vector3(-arena.width + 2 * arena.wallSize,
     //     -arena.height + 2 * arena.wallSize, 0);
-    initialPosVirus = new Vector3(0, 2, 0);
-    initialDirVirus = new Vector3(-1, 0, 0);
+    let initialPosPlayer = new Vector3(0, 2, 0);
+    let initialDirPlayer = new Vector3(-1, 0, 0);
 
-    // Add virus to scene
-    virus = new Virus(this, initialPosVirus.clone(), initialDirVirus.clone());
-    this.virus = virus;
+    // Add player to scene
+    let player = new Player(this, initialPosPlayer.clone(), initialDirPlayer.clone());
+    this.player = player;
 
-    console.log("IN GAME SCENE CONSTRUCTOR")
+    // Add an experimental ball. 
+    let ball = new Ball(); 
+    this.ball = ball; 
+    this.add(ball);
 
     // Add area to scene.
     this.height = 50;
@@ -71,7 +73,7 @@ class GameScene extends Scene {
 
     flower = new Flower(this);
     const lights = new BasicLights();
-    this.add(arena, virus, flower, lights);
+    this.add(arena, player, flower, lights);
 
     // Populate GUI
     this.state.gui.add(this.state, "rotationSpeed", -5, 5);
@@ -92,8 +94,6 @@ class GameScene extends Scene {
     for (const obj of updateList) {
       obj.update(timeStamp);
     }
-
-    // Check whether we need to move the virus.
   }
 }
 

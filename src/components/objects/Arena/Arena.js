@@ -108,10 +108,10 @@ class Arena extends Group {
 
   // update Land to color based on player positions
   update(timeStamp) {
-    if (this.parent.virus) {
-      let virus_x = this.parent.virus.state.mesh.position.x;
-      let virus_z = this.parent.virus.state.mesh.position.z;
-      let i = this.index(virus_x, virus_z);
+    if (this.parent.player) {
+      let player_x = this.parent.player.state.mesh.position.x;
+      let player_z = this.parent.player.state.mesh.position.z;
+      let i = this.index(player_x, player_z);
       this.floor[i].material.color = new Color(0x0);
     }
     // if (this.state.bob) {

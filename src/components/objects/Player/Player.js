@@ -8,14 +8,12 @@ import {
   Color,
   Euler,
 } from "three";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import MODEL from "./virus.gltf";
 
-class Virus extends Group {
+class Player extends Group {
   constructor(parent, pos, direction) {
     // Call parent Group() constructor
     super();
-    this.name = "virus";
+    this.name = "player";
 
     console.log("IN CONSTRUCTOR");
 
@@ -27,7 +25,7 @@ class Virus extends Group {
       prevPosition: pos.clone(),
       direction: direction,
       score: 0, // number of tiles colored
-      // Define a boolean array to determine where the virus should go.
+      // Define a boolean array to determine where the player should go.
       // Each key corresponds to Left,Up,Right,Down.
       keys: [0, 0, 0, 0],
       radius: 1,
@@ -108,7 +106,7 @@ class Virus extends Group {
     const speed = 0.2;
     const angle = (3 * Math.PI) / 180;
 
-    // Iterate over the arrow keys. If any are pressed, either rotate the camera or move the virus.
+    // Iterate over the arrow keys. If any are pressed, either rotate the camera or move the player.
     for (let i = 0; i < this.state.keys.length; i++) {
       if (this.state.keys[i] === 1) {
         let x, z, cameraX, cameraZ, force;
@@ -175,7 +173,7 @@ class Virus extends Group {
       newPosClone.z
     );
 
-    // Update the direction the virus is travelling in.
+    // Update the direction the player is travelling in.
     this.state.direction = this.state.position
       .clone()
       .sub(this.state.prevPosition.clone())
@@ -193,7 +191,7 @@ class Virus extends Group {
     this.addFrictionForce();
   }    
 
-  // Update the position of the virus w/ Newtonian motion.
+  // Update the position of the player w/ Newtonian motion.
   findNewPosition() {
     let prevPosition = this.state.prevPosition.clone();
     let currPosition = this.state.position.clone();
@@ -266,4 +264,4 @@ class Virus extends Group {
   }
 }
 
-export default Virus;
+export default Player;
