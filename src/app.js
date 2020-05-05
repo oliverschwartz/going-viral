@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import * as CANNON from "cannon";
+import * as CANNON from "./cannon";
 import { BasicLights } from "lights";
 
 /***************************************************************************/
@@ -173,7 +173,7 @@ function animate() {
     // Check for user input.
     applyImpluses();
 
-    console.log(sphereBody.position);
+    // console.log(sphereBody.position);
 
     // Update the camera position.
     focusCamera();
