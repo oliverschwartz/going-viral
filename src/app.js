@@ -161,8 +161,8 @@ function init() {
         new THREE.MeshPhongMaterial({ color: 0x1244fe })
     );
     scene.add(sphereMesh);
-    sphereBody.position.set(0, 5, 0);
-    sphereMesh.position.set(0, 5, 0);
+    sphereBody.position.set(0, sphereRestHeight + EPS, 0);
+    sphereMesh.position.set(0, sphereRestHeight + EPS, 0);
 }
 
 // Main animation loop. 
@@ -257,6 +257,7 @@ function handleWallCollisions() {
     }
 }
 
+// Calculate the rebound velocity upon collision with a wall. 
 function calculateVelocity(normal, velocity) {
     let dot = normal.dot(velocity.clone());
     let c = normal.clone().scale(2 * dot);
