@@ -10,8 +10,8 @@ const EPS = 0.02;
 const impact = 10 ** -2;
 const width = 20;
 const height = 20;
-const camDistXZ = 15; 
-const camHeight = 10; 
+const camDistXZ = 15;
+const camHeight = 10;
 const angle = (3 * Math.PI) / 180;
 var world;
 var controls, renderer, scene, camera;
@@ -178,13 +178,11 @@ function createWall(length, position, rotate) {
 
 // Ensure the camera is aligned with the sphere's direction of travel.
 function focusCamera() {
-    let negDirection = sphereDir.clone().normalize().negate(); 
+    let negDirection = sphereDir.clone().normalize().negate();
     negDirection = negDirection.multiplyScalar(camDistXZ);
-    let destination = sphereMesh.position.clone().add(negDirection); 
-    camera.position.set(destination.x, camHeight, destination.z); 
-    console.log(camera.position)
+    let destination = sphereMesh.position.clone().add(negDirection);
+    camera.position.set(destination.x, camHeight, destination.z);
     camera.lookAt(sphereMesh.position);
-    // camera.lookAt(sphereMesh.position.x, sphereMesh.position.y, sphereMesh.position.z);
 }
 
 function handleWallCollisions() {
@@ -216,7 +214,7 @@ function handleWallCollisions() {
     }
     // -z wall
     if (sphereBody.position.z - EPS <= -height / 2) {
-        sphereBody.position.x = -height / 2 + EPS;
+        sphereBody.position.z = -height / 2 + EPS;
         sphereBody.velocity = calculateVelocity(
             new CANNON.Vec3(0, 0, -1),
             velocity
@@ -247,10 +245,12 @@ function applyImpluses() {
                     );
                     break;
                 case 2: // Right.
-                    sphereDir.applyEuler(new Euler(0, -angle, 0));
+                    sphereDir.applyEuler(new THREE.Euler(0, -angle, 0));
+                    focusCamera();
                     break;
                 case 3: // Left.
-                    sphereDir.applyEuler(new Euler(0, angle, 0));
+                    sphereDir.applyEuler(new THREE.Euler(0, angle, 0));
+                    focusCamera();
                     break;
             }
         }
