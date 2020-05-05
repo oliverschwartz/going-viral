@@ -3,10 +3,10 @@ import * as CANNON from "cannon";
 import { BasicLights } from "lights";
 
 /***************************************************************************/
+/* CONSTANTS AND VARIABLES */
 
-// Constants and variables.
 const dt = 1 / 60;
-const EPS = 0.02;
+const EPS = 0.5;
 const impact = 10 ** -2;
 const width = 20;
 const height = 20;
@@ -25,19 +25,22 @@ var boxMeshes = [],
 var keys = [0, 0, 0, 0];
 
 /***************************************************************************/
+/* INITIALIZATION */
 
 initCannon();
 init();
 animate();
 
 /***************************************************************************/
+/* INITIALIZATION FUNCTIONS */
 
+// Initialize our CANNON physics engine. 
 function initCannon() {
     world = new CANNON.World();
     world.gravity.set(0, -9.8, 0);
     world.broadphase = new CANNON.NaiveBroadphase();
 
-    // Create a plane
+    // Create a plane (invisible, the blocks sit on this).
     var groundShape = new CANNON.Plane();
     var groundBody = new CANNON.Body({ mass: 0, linearDamping: 0.1 });
     groundBody.addShape(groundShape);
@@ -84,7 +87,7 @@ function init() {
     windowResizeHandler();
     window.addEventListener("resize", windowResizeHandler, false);
 
-    // Make the sphere slippery.
+    // Specify the slipperiness of surfaces. 
     let groundMaterial = new CANNON.Material("groundMaterial");
     let slipperyMaterial = new CANNON.Material("slipperyMaterial");
     let ground_slippery_cm = new CANNON.ContactMaterial(
@@ -161,6 +164,35 @@ function init() {
     sphereMesh.position.set(0, 5, 0);
 }
 
+// Main animation loop. 
+function animate() {
+    window.requestAnimationFrame(animate);
+    world.step(dt);
+
+    // Check for user input.
+    applyImpluses();
+
+    // Update the camera position.
+    focusCamera();
+
+    // Handle wall collisions.
+    handleWallCollisions();
+
+    // Update sphere position.
+    sphereMesh.position.copy(sphereBody.position);
+    sphereMesh.quaternion.copy(sphereBody.quaternion);
+
+    renderer.render(scene, camera);
+}
+
+/***************************************************************************/
+/* HELPER FUNCTIONS */
+
+/* 
+    Create a wall at the specified position. 
+    There is no corresponding CANNON object for the wall
+    as we handle collisions manually. 
+*/
 function createWall(length, position, rotate) {
     let wallGeometry = new THREE.BoxGeometry(boxRad * 2, boxRad * 2, length);
     let wallMesh = new THREE.Mesh(
@@ -244,11 +276,11 @@ function applyImpluses() {
                         sphereBody.position
                     );
                     break;
-                case 2: // Right.
+                case 2: // Change the ball's direction; update camera.
                     sphereDir.applyEuler(new THREE.Euler(0, -angle, 0));
                     focusCamera();
                     break;
-                case 3: // Left.
+                case 3: // Change the ball's direction; update camera.
                     sphereDir.applyEuler(new THREE.Euler(0, angle, 0));
                     focusCamera();
                     break;
@@ -301,22 +333,4 @@ function registerListeners() {
     })();
 }
 
-function animate() {
-    window.requestAnimationFrame(animate);
-    world.step(dt);
 
-    // Check for user input.
-    applyImpluses();
-
-    // Update the camera position.
-    focusCamera();
-
-    // Handle wall collisions.
-    handleWallCollisions();
-
-    // Update sphere position.
-    sphereMesh.position.copy(sphereBody.position);
-    sphereMesh.quaternion.copy(sphereBody.quaternion);
-
-    renderer.render(scene, camera);
-}
