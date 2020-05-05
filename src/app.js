@@ -6,13 +6,14 @@ import { BasicLights } from "lights";
 /* CONSTANTS AND VARIABLES */
 
 const dt = 1 / 60;
-const EPS = 0.5;
+const EPS = 0.05;
 const impact = 10 ** -2;
 const width = 20;
 const height = 20;
 const camDistXZ = 15;
 const camHeight = 10;
 const angle = (3 * Math.PI) / 180;
+const sphereRestHeight = 2.5; 
 var world;
 var controls, renderer, scene, camera;
 var boxMeshes = [],
@@ -22,7 +23,7 @@ var boxMeshes = [],
     sphereBody,
     sphereRad,
     sphereDir;
-var keys = [0, 0, 0, 0];
+var keys = [0, 0, 0, 0, 0]; // Up, Down, Left, Right, Jump!
 
 /***************************************************************************/
 /* INITIALIZATION */
@@ -37,7 +38,7 @@ animate();
 // Initialize our CANNON physics engine. 
 function initCannon() {
     world = new CANNON.World();
-    world.gravity.set(0, -9.8, 0);
+    world.gravity.set(0, -15, 0);
     world.broadphase = new CANNON.NaiveBroadphase();
 
     // Create a plane (invisible, the blocks sit on this).
@@ -172,6 +173,8 @@ function animate() {
     // Check for user input.
     applyImpluses();
 
+    console.log(sphereBody.position);
+
     // Update the camera position.
     focusCamera();
 
@@ -284,6 +287,11 @@ function applyImpluses() {
                     sphereDir.applyEuler(new THREE.Euler(0, angle, 0));
                     focusCamera();
                     break;
+                case 4: // Jump! (only if not in the air).
+                    if (sphereBody.position.y <= sphereRestHeight + EPS) {
+                        sphereBody.applyImpulse(new CANNON.Vec3(0, 3, 0), sphereBody.position); 
+                    }
+                    break;
             }
         }
     }
@@ -307,6 +315,9 @@ function registerListeners() {
                 if (e.key === "ArrowLeft") {
                     keys[3] = 1;
                 }
+                if (e.key === " ") {
+                    keys[4] = 1; 
+                }
             },
             false
         );
@@ -326,6 +337,9 @@ function registerListeners() {
                 }
                 if (e.key === "ArrowLeft") {
                     keys[3] = 0;
+                }
+                if (e.key === " ") {
+                    keys[4] = 0; 
                 }
             },
             false
