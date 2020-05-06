@@ -2,6 +2,7 @@ import * as THREE from "three";
 import * as CANNON from "cannon";
 import { BasicLights } from "lights";
 import { updateCellsForParticle } from "./updateRender.js";
+import { Virus } from "virus";
 const loader = new THREE.TextureLoader();
 const bgTexture = loader.load("../assets/bg.jpg");
 
