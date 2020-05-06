@@ -2,6 +2,8 @@ import * as THREE from "three";
 import * as CANNON from "cannon";
 import { BasicLights } from "lights";
 import { updateCellsForParticle } from "./updateRender.js";
+const loader = new THREE.TextureLoader();
+const bgTexture = loader.load("../assets/bg.jpg");
 
 /***************************************************************************/
 /* CONSTANTS AND VARIABLES */
@@ -74,7 +76,8 @@ function init() {
   // Add some lights.
   const lights = new BasicLights();
   scene.add(lights);
-  scene.background = new THREE.Color(0x7ec0ee);
+  //   scene.background = new THREE.Color(0x7ec0ee);
+  scene.background = bgTexture;
 
   // Add event listeners.
   registerListeners();
@@ -152,7 +155,8 @@ function init() {
       let boxMesh = new THREE.Mesh(
         boxGeometry,
         new THREE.MeshLambertMaterial({
-          color: 0xffffff * Math.random(),
+          //   color: 0xffffff * Math.random(),
+          color: 0x75100e,
         })
       );
       world.addBody(boxBody);
@@ -197,7 +201,7 @@ function init() {
   world.add(sphereBody);
   sphereMesh = new THREE.Mesh(
     new THREE.SphereGeometry(sphereRad, 100, 100),
-    new THREE.MeshPhongMaterial({ color: 0x1244fe })
+    new THREE.MeshPhongMaterial({ color: 0x347a1f })
   );
   scene.add(sphereMesh);
   sphereBody.position.set(0, sphereRestHeight + EPS, 0);
@@ -242,7 +246,7 @@ function createWall(length, position, rotate) {
   let wallMesh = new THREE.Mesh(
     wallGeometry,
     new THREE.MeshLambertMaterial({
-      color: 0x0,
+      color: 0x75100e,
     })
   );
   scene.add(wallMesh);
