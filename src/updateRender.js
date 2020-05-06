@@ -20,7 +20,7 @@ export function updateCellsForParticle(particle) {
 function index(x, z) {
   let boxRad = APP.getBoxRad();
   let index =
-    Math.round(x / (boxRad * 2)) * (APP.width / (boxRad * 2)) +
+    Math.round(x / (boxRad * 2)) * (APP.height / (boxRad * 2)) +
     Math.round(z / (boxRad * 2));
   //   let x_index = Math.round((x + APP.width / 2) / boxRad);
   //   let z_index = Math.round((z + APP.height / 2) / boxRad);

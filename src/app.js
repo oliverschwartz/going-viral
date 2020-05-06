@@ -188,7 +188,7 @@ function init() {
   sphereDir = new THREE.Vector3(1, 0, 0);
   let sphereShape = new CANNON.Sphere(sphereRad);
   sphereBody = new CANNON.Body({
-    mass: 1,
+    mass: 0.3,
     linearDamping: 0.5,
     angularDamping: 0.5,
     material: slipperyMaterial,
