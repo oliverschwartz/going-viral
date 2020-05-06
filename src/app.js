@@ -323,6 +323,7 @@ function applyImpluses() {
           break;
         case 4: // Jump! (only if not in the air).
           if (sphereBody.position.y <= sphereRestHeight + EPS) {
+            console.log("JUMPING!")
             sphereBody.applyImpulse(
               new CANNON.Vec3(0, 3, 0),
               sphereBody.position
