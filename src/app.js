@@ -10,18 +10,17 @@ const bgTexture = loader.load("../assets/bg.jpg");
 
 const dt = 1 / 60;
 export const EPS = 0.05;
-const impact = 10 ** -2;
-export const width = 100;
-export const height = 200;
+const impact = 10 ** -3;
+export const width = 20;
+export const height = 100;
 const camDistXZ = 15;
 const camHeight = 10;
 const angle = (3 * Math.PI) / 180;
 const sphereRestHeight = 0.5;
 var world;
 var controls, renderer, scene, camera;
-var boxMeshes = [],
-    boxBodies = [],
-    boxRad,
+var planeMeshes = [],
+    planeRad,
     sphereMesh,
     sphereBody,
     sphereRad,
@@ -99,7 +98,7 @@ function init() {
         groundMaterial,
         slipperyMaterial,
         {
-            friction: 0,
+            friction: 0.8,
             restitution: 0.3,
             contactEquationStiffness: 1e8,
             contactEquationRelaxation: 3,
@@ -110,13 +109,13 @@ function init() {
     world.addContactMaterial(ground_slippery_cm);
 
     // Add boxes on top of the plane.
-    boxRad = 1;
-    // let halfExtents = new CANNON.Vec3(boxRad, boxRad, boxRad);
+    planeRad = 1;
+    // let halfExtents = new CANNON.Vec3(planeRad, planeRad, planeRad);
     // let boxShape = new CANNON.Box(halfExtents);
-    // for (let i = -width / 2 + boxRad; i < width / 2; i += boxRad * 2) {
-    //     for (let j = -height / 2 + boxRad; j < height / 2; j += boxRad * 2) {
+    // for (let i = -width / 2 + planeRad; i < width / 2; i += planeRad * 2) {
+    //     for (let j = -height / 2 + planeRad; j < height / 2; j += planeRad * 2) {
     //         let x = i;
-    //         let y = boxRad;
+    //         let y = planeRad;
     //         let z = j;
     //         let boxBody = new CANNON.Body({
     //             mass: 5,
@@ -137,12 +136,12 @@ function init() {
     //         boxMesh.castShadow = true;
     //         boxMesh.receiveShadow = true;
     //         boxBodies.push(boxBody);
-    //         boxMeshes.push(boxMesh);
+    //         planeMeshes.push(boxMesh);
     //     }
     // }
-    // let boxGeometry = new THREE.BoxGeometry(boxRad * 2, boxRad * 2, boxRad * 2);
-    for (let i = 0; i < width; i += boxRad * 2) {
-        for (let j = 0; j < height; j += boxRad * 2) {
+    // let boxGeometry = new THREE.BoxGeometry(planeRad * 2, planeRad * 2, planeRad * 2);
+    for (let i = 0; i < width; i += planeRad * 2) {
+        for (let j = 0; j < height; j += planeRad * 2) {
             let x = i;
             let y = 0;
             let z = j;
@@ -153,7 +152,7 @@ function init() {
             //   });
             //   boxBody.addShape(boxShape);
             let planeMesh = new THREE.Mesh(
-                new THREE.PlaneGeometry(boxRad * 2, boxRad * 2, 1),
+                new THREE.PlaneGeometry(planeRad * 2, planeRad * 2, 1),
                 new THREE.MeshLambertMaterial({
                     side: THREE.DoubleSide,
                     color: 0x75100e,
@@ -167,17 +166,17 @@ function init() {
             planeMesh.receiveShadow = true;
             planeMesh.rotation.x = Math.PI / 2;
             // boxBodies.push(boxBody);
-            // boxMeshes.push(boxMesh);
+            planeMeshes.push(planeMesh);
         }
     }
 
     // Create 4 walls.
-    createWall(height, new CANNON.Vec3(width, 1, height / 2 - boxRad));
-    createWall(height, new CANNON.Vec3(0 - boxRad * 2, 1, height / 2 - boxRad));
-    createWall(width, new CANNON.Vec3(width / 2 - boxRad, 1, height), true);
+    createWall(height, new CANNON.Vec3(width, 1, height / 2 - planeRad));
+    createWall(height, new CANNON.Vec3(0 - planeRad * 2, 1, height / 2 - planeRad));
+    createWall(width, new CANNON.Vec3(width / 2 - planeRad, 1, height), true);
     createWall(
         width,
-        new CANNON.Vec3(width / 2 - boxRad, 1, -boxRad * 2),
+        new CANNON.Vec3(width / 2 - planeRad, 1, -planeRad * 2),
         true
     );
 
@@ -186,7 +185,7 @@ function init() {
     sphereDir = new THREE.Vector3(1, 0, 0);
     let sphereShape = new CANNON.Sphere(sphereRad);
     sphereBody = new CANNON.Body({
-        mass: 0.3,
+        mass: 1,
         linearDamping: 0.5,
         angularDamping: 0.5,
         material: slipperyMaterial,
@@ -223,7 +222,7 @@ function animate() {
     sphereMesh.quaternion.copy(sphereBody.quaternion);
 
     // Update grid cells
-    // updateCellsForParticle(sphereMesh);
+    updateCellsForParticle(sphereMesh);
     renderer.render(scene, camera);
 }
 
@@ -236,7 +235,7 @@ function animate() {
     as we handle collisions manually. 
 */
 function createWall(length, position, rotate) {
-    let wallGeometry = new THREE.BoxGeometry(boxRad * 2, boxRad * 2, length);
+    let wallGeometry = new THREE.BoxGeometry(planeRad * 2, planeRad * 2, length);
     let wallMesh = new THREE.Mesh(
         wallGeometry,
         new THREE.MeshLambertMaterial({
@@ -263,8 +262,8 @@ function handleWallCollisions() {
     let velocity = sphereBody.velocity.clone();
 
     // +x wall
-    if (sphereBody.position.x >= width - boxRad - sphereRad) {
-        sphereBody.position.x = width - boxRad - sphereRad;
+    if (sphereBody.position.x >= width - planeRad - sphereRad) {
+        sphereBody.position.x = width - planeRad - sphereRad;
         sphereBody.velocity = calculateVelocity(
             new CANNON.Vec3(1, 0, 0),
             velocity
@@ -279,8 +278,8 @@ function handleWallCollisions() {
         );
     }
     // +z wall
-    if (sphereBody.position.z >= height - boxRad - sphereRad) {
-        sphereBody.position.z = height - boxRad - sphereRad;
+    if (sphereBody.position.z >= height - planeRad - sphereRad) {
+        sphereBody.position.z = height - planeRad - sphereRad;
         sphereBody.velocity = calculateVelocity(
             new CANNON.Vec3(0, 0, 1),
             velocity
@@ -392,8 +391,8 @@ function registerListeners() {
 }
 
 export function getFloor() {
-    return boxMeshes;
+    return planeMeshes;
 }
-export function getBoxRad() {
-    return boxRad;
+export function getplaneRad() {
+    return planeRad;
 }
