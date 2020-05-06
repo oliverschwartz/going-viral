@@ -14,6 +14,7 @@ export const EPS = 0.05;
 const impact = 10 ** -3;
 export const width = 20;
 export const height = 100;
+export const planeRad = 1; 
 const camDistXZ = 15;
 const camHeight = 10;
 const angle = (3 * Math.PI) / 180;
@@ -21,11 +22,11 @@ const sphereRestHeight = 0.5;
 var world;
 var controls, renderer, scene, camera;
 var planeMeshes = [],
-    planeRad,
     sphereMesh,
     sphereBody,
     sphereRad,
     sphereDir;
+var virus;
 var keys = [0, 0, 0, 0, 0]; // Up, Down, Left, Right, Jump!
 
 /***************************************************************************/
@@ -99,7 +100,7 @@ function init() {
         groundMaterial,
         slipperyMaterial,
         {
-            friction: 0.8,
+            friction: 0,
             restitution: 0.3,
             contactEquationStiffness: 1e8,
             contactEquationRelaxation: 3,
@@ -107,51 +108,27 @@ function init() {
             frictionEquationRegularizationTime: 3,
         }
     );
+    let ground_ground_cm = new CANNON.ContactMaterial(
+        groundMaterial,
+        groundMaterial,
+        {
+            friction: 0,
+            restitution: 1,
+            contactEquationStiffness: 1e8,
+            contactEquationRelaxation: 3,
+            frictionEquationStiffness: 1e8,
+            frictionEquationRegularizationTime: 3,
+        }
+    );
     world.addContactMaterial(ground_slippery_cm);
+    world.addContactMaterial(ground_ground_cm);
 
     // Add boxes on top of the plane.
-    planeRad = 1;
-    // let halfExtents = new CANNON.Vec3(planeRad, planeRad, planeRad);
-    // let boxShape = new CANNON.Box(halfExtents);
-    // for (let i = -width / 2 + planeRad; i < width / 2; i += planeRad * 2) {
-    //     for (let j = -height / 2 + planeRad; j < height / 2; j += planeRad * 2) {
-    //         let x = i;
-    //         let y = planeRad;
-    //         let z = j;
-    //         let boxBody = new CANNON.Body({
-    //             mass: 5,
-    //             linearDamping: 0.1,
-    //             material: groundMaterial,
-    //         });
-    //         boxBody.addShape(boxShape);
-    //         let boxMesh = new THREE.Mesh(
-    //             boxGeometry,
-    //             new THREE.MeshLambertMaterial({
-    //                 color: 0xffffff * Math.random(),
-    //             })
-    //         );
-    //         world.addBody(boxBody);
-    //         scene.add(boxMesh);
-    //         boxBody.position.set(x, y, z);
-    //         boxMesh.position.set(x, y, z);
-    //         boxMesh.castShadow = true;
-    //         boxMesh.receiveShadow = true;
-    //         boxBodies.push(boxBody);
-    //         planeMeshes.push(boxMesh);
-    //     }
-    // }
-    // let boxGeometry = new THREE.BoxGeometry(planeRad * 2, planeRad * 2, planeRad * 2);
     for (let i = 0; i < width; i += planeRad * 2) {
         for (let j = 0; j < height; j += planeRad * 2) {
             let x = i;
             let y = 0;
             let z = j;
-            //   let boxBody = new CANNON.Body({
-            //     mass: 5,
-            //     linearDamping: 0.1,
-            //     material: groundMaterial,
-            //   });
-            //   boxBody.addShape(boxShape);
             let planeMesh = new THREE.Mesh(
                 new THREE.PlaneGeometry(planeRad * 2, planeRad * 2, 1),
                 new THREE.MeshLambertMaterial({
@@ -159,21 +136,21 @@ function init() {
                     color: 0x75100e,
                 })
             );
-            // world.addBody(boxBody);
             scene.add(planeMesh);
-            // boxBody.position.set(x, y, z);
             planeMesh.position.set(x, y, z);
             planeMesh.castShadow = true;
             planeMesh.receiveShadow = true;
             planeMesh.rotation.x = Math.PI / 2;
-            // boxBodies.push(boxBody);
             planeMeshes.push(planeMesh);
         }
     }
 
     // Create 4 walls.
     createWall(height, new CANNON.Vec3(width, 1, height / 2 - planeRad));
-    createWall(height, new CANNON.Vec3(0 - planeRad * 2, 1, height / 2 - planeRad));
+    createWall(
+        height,
+        new CANNON.Vec3(0 - planeRad * 2, 1, height / 2 - planeRad)
+    );
     createWall(width, new CANNON.Vec3(width / 2 - planeRad, 1, height), true);
     createWall(
         width,
@@ -189,7 +166,7 @@ function init() {
         mass: 1,
         linearDamping: 0.5,
         angularDamping: 0.5,
-        material: slipperyMaterial,
+        material: groundMaterial,
     });
     sphereBody.addShape(sphereShape);
     world.add(sphereBody);
@@ -200,6 +177,14 @@ function init() {
     scene.add(sphereMesh);
     sphereBody.position.set(0, sphereRestHeight + EPS, 0);
     sphereMesh.position.set(0, sphereRestHeight + EPS, 0);
+
+    // Create a virus.
+    virus = new Virus(
+        new THREE.Vector3(10, sphereRestHeight, 10),
+        slipperyMaterial,
+        world
+    );
+    scene.add(virus.mesh);
 }
 
 // Main animation loop.
@@ -215,12 +200,15 @@ function animate() {
     // Update the camera position.
     focusCamera();
 
-    // Handle wall collisions.
+    // Handle wall collisions and update sphere positions.
     handleWallCollisions();
-
-    // Update sphere position.
     sphereMesh.position.copy(sphereBody.position);
     sphereMesh.quaternion.copy(sphereBody.quaternion);
+
+    // Update virus position.
+    virus.handleWallCollisions();
+    virus.mesh.position.copy(virus.body.position); 
+    virus.mesh.quaternion.copy(virus.body.quaternion);
 
     // Update grid cells
     updateCellsForParticle(sphereMesh);
@@ -236,7 +224,11 @@ function animate() {
     as we handle collisions manually. 
 */
 function createWall(length, position, rotate) {
-    let wallGeometry = new THREE.BoxGeometry(planeRad * 2, planeRad * 2, length);
+    let wallGeometry = new THREE.BoxGeometry(
+        planeRad * 2,
+        planeRad * 2,
+        length
+    );
     let wallMesh = new THREE.Mesh(
         wallGeometry,
         new THREE.MeshLambertMaterial({
