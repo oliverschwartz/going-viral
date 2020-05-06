@@ -1,15 +1,16 @@
 import * as THREE from "three";
-import * as CANNON from "./cannon";
+import * as CANNON from "cannon";
 import { BasicLights } from "lights";
+import { updateCellsForParticle } from './updateRender.js';
 
 /***************************************************************************/
 /* CONSTANTS AND VARIABLES */
 
 const dt = 1 / 60;
-const EPS = 0.05;
+export const EPS = 0.05;
 const impact = 10 ** -2;
-const width = 20;
-const height = 20;
+export const width = 20;
+export const height = 20;
 const camDistXZ = 15;
 const camHeight = 10;
 const angle = (3 * Math.PI) / 180;
@@ -110,8 +111,35 @@ function init() {
     let halfExtents = new CANNON.Vec3(boxRad, boxRad, boxRad);
     let boxShape = new CANNON.Box(halfExtents);
     let boxGeometry = new THREE.BoxGeometry(boxRad * 2, boxRad * 2, boxRad * 2);
-    for (let i = -width / 2 + boxRad; i < width / 2; i += boxRad * 2) {
-        for (let j = -height / 2 + boxRad; j < height / 2; j += boxRad * 2) {
+    // for (let i = -width / 2 + boxRad; i < width / 2; i += boxRad * 2) {
+    //     for (let j = -height / 2 + boxRad; j < height / 2; j += boxRad * 2) {
+    //         let x = i;
+    //         let y = boxRad;
+    //         let z = j;
+    //         let boxBody = new CANNON.Body({
+    //             mass: 5,
+    //             linearDamping: 0.1,
+    //             material: groundMaterial,
+    //         });
+    //         boxBody.addShape(boxShape);
+    //         let boxMesh = new THREE.Mesh(
+    //             boxGeometry,
+    //             new THREE.MeshLambertMaterial({
+    //                 color: 0xffffff * Math.random(),
+    //             })
+    //         );
+    //         world.addBody(boxBody);
+    //         scene.add(boxMesh);
+    //         boxBody.position.set(x, y, z);
+    //         boxMesh.position.set(x, y, z);
+    //         boxMesh.castShadow = true;
+    //         boxMesh.receiveShadow = true;
+    //         boxBodies.push(boxBody);
+    //         boxMeshes.push(boxMesh);
+    //     }
+    // }
+      for (let i = 0; i < width; i += boxRad*2) {
+        for (let j = 0; j < height; j += boxRad*2) {
             let x = i;
             let y = boxRad;
             let z = j;
@@ -139,10 +167,14 @@ function init() {
     }
 
     // Create some walls.
-    createWall(height, new CANNON.Vec3(width / 2 + boxRad, 3, 0));
-    createWall(height, new CANNON.Vec3(-width / 2 - boxRad, 3, 0));
-    createWall(width, new CANNON.Vec3(0, 3, height / 2 + boxRad), true);
-    createWall(width, new CANNON.Vec3(0, 3, -height / 2 - boxRad), true);
+    // createWall(height, new CANNON.Vec3(width / 2 + boxRad, 3, 0));
+    // createWall(height, new CANNON.Vec3(-width / 2 - boxRad, 3, 0));
+    // createWall(width, new CANNON.Vec3(0, 3, height / 2 + boxRad), true);
+    // createWall(width, new CANNON.Vec3(0, 3, -height / 2 - boxRad), true);
+    createWall(height, new CANNON.Vec3(width, 3, width/2-boxRad)); // far x wall
+    createWall(height, new CANNON.Vec3(0 - boxRad*2, 3, width/2-boxRad));
+    createWall(width, new CANNON.Vec3(height/2 - boxRad, 3, height), true);
+    createWall(width, new CANNON.Vec3(height/2 - boxRad, 3, 0 - boxRad*2), true);
 
     // Create a sphere.
     sphereRad = 0.5;
@@ -185,6 +217,8 @@ function animate() {
     sphereMesh.position.copy(sphereBody.position);
     sphereMesh.quaternion.copy(sphereBody.quaternion);
 
+    // Update grid cells
+    updateCellsForParticle(sphereMesh);
     renderer.render(scene, camera);
 }
 
@@ -224,32 +258,32 @@ function handleWallCollisions() {
     let velocity = sphereBody.velocity.clone();
 
     // +x wall
-    if (sphereBody.position.x + EPS >= width / 2) {
-        sphereBody.position.x = width / 2 - EPS;
+    if (sphereBody.position.x >= width - boxRad - sphereRad) {
+        sphereBody.position.x = width - boxRad- sphereRad;
         sphereBody.velocity = calculateVelocity(
             new CANNON.Vec3(1, 0, 0),
             velocity
         );
     }
     // -x wall
-    if (sphereBody.position.x - EPS <= -width / 2) {
-        sphereBody.position.x = -width / 2 + EPS;
+    if (sphereBody.position.x <= EPS) {
+        sphereBody.position.x = EPS;
         sphereBody.velocity = calculateVelocity(
             new CANNON.Vec3(1, 0, 0),
             velocity
         );
     }
     // +z wall
-    if (sphereBody.position.z + EPS >= height / 2) {
-        sphereBody.position.z = height / 2 - EPS;
+    if (sphereBody.position.z >= height - boxRad - sphereRad) {
+        sphereBody.position.z = height - boxRad - sphereRad;
         sphereBody.velocity = calculateVelocity(
             new CANNON.Vec3(0, 0, 1),
             velocity
         );
     }
     // -z wall
-    if (sphereBody.position.z - EPS <= -height / 2) {
-        sphereBody.position.z = -height / 2 + EPS;
+    if (sphereBody.position.z <= EPS) {
+        sphereBody.position.z = EPS;
         sphereBody.velocity = calculateVelocity(
             new CANNON.Vec3(0, 0, -1),
             velocity
@@ -348,4 +382,5 @@ function registerListeners() {
     })();
 }
 
-
+export function getFloor() {return boxMeshes;}
+export function getBoxRad() {return boxRad;}
