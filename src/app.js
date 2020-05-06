@@ -14,7 +14,7 @@ export const EPS = 0.05;
 const impact = 10 ** -3;
 export const width = 20;
 export const height = 100;
-export const planeRad = 1; 
+export const planeRad = 1;
 const camDistXZ = 15;
 const camHeight = 10;
 const angle = (3 * Math.PI) / 180;
@@ -47,7 +47,7 @@ function initCannon() {
 
     // Create a plane (invisible, the blocks sit on this).
     var groundShape = new CANNON.Plane();
-    var groundBody = new CANNON.Body({ mass: 0, linearDamping: 0.1 });
+    var groundBody = new CANNON.Body({ mass: 0, linearDamping: 0 });
     groundBody.addShape(groundShape);
     groundBody.quaternion.setFromAxisAngle(
         new CANNON.Vec3(1, 0, 0),
@@ -100,8 +100,8 @@ function init() {
         groundMaterial,
         slipperyMaterial,
         {
-            friction: 0,
-            restitution: 0.3,
+            friction: 0.0,
+            restitution: 1,
             contactEquationStiffness: 1e8,
             contactEquationRelaxation: 3,
             frictionEquationStiffness: 1e8,
@@ -207,8 +207,10 @@ function animate() {
 
     // Update virus position.
     virus.handleWallCollisions();
-    virus.mesh.position.copy(virus.body.position); 
+    virus.mesh.position.copy(virus.body.position);
     virus.mesh.quaternion.copy(virus.body.quaternion);
+
+    console.log(virus.body.velocity);
 
     // Update grid cells
     updateCellsForParticle(sphereMesh);
@@ -255,15 +257,15 @@ function handleWallCollisions() {
     let velocity = sphereBody.velocity.clone();
 
     // +x wall
-    if (sphereBody.position.x >= width - planeRad - sphereRad) {
-        sphereBody.position.x = width - planeRad - sphereRad;
+    if (sphereBody.position.x > width - planeRad - sphereRad) {
+        sphereBody.position.x = width - planeRad - sphereRad - EPS;
         sphereBody.velocity = calculateVelocity(
             new CANNON.Vec3(1, 0, 0),
             velocity
         );
     }
     // -x wall
-    if (sphereBody.position.x <= EPS) {
+    if (sphereBody.position.x < EPS) {
         sphereBody.position.x = EPS;
         sphereBody.velocity = calculateVelocity(
             new CANNON.Vec3(1, 0, 0),
@@ -272,14 +274,14 @@ function handleWallCollisions() {
     }
     // +z wall
     if (sphereBody.position.z >= height - planeRad - sphereRad) {
-        sphereBody.position.z = height - planeRad - sphereRad;
+        sphereBody.position.z = height - planeRad - sphereRad - EPS;
         sphereBody.velocity = calculateVelocity(
             new CANNON.Vec3(0, 0, 1),
             velocity
         );
     }
     // -z wall
-    if (sphereBody.position.z <= EPS) {
+    if (sphereBody.position.z < EPS) {
         sphereBody.position.z = EPS;
         sphereBody.velocity = calculateVelocity(
             new CANNON.Vec3(0, 0, -1),
