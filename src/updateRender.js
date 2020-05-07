@@ -2,7 +2,6 @@ import * as APP from "./app.js";
 
 export function updateCellsForParticle(particle) {
   // Count scores
-  if (particle.position.x >= APP.width - APP.getplaneRad()) return;
   if (particle.position.z >= APP.height - APP.getplaneRad()) return;
   let boxMeshes = APP.getFloor();
   var i = index(particle.position.x, particle.position.z);
@@ -14,6 +13,12 @@ export function updateCellsForParticle(particle) {
   // Updates grid to particle's color
 
   boxMeshes[i].material.color.set(particle.material.color);
+
+  // Callback to change colour back after a few seconds. 
+  setTimeout(function () {
+    boxMeshes[i].material.color.set(0x75100e)
+  }, 1000);
+  // floor color: 0x75100e
   // arena.tileColors[i] = particle.num;
 }
 

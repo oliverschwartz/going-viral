@@ -26,7 +26,7 @@ var planeMeshes = [],
     sphereBody,
     sphereRad,
     sphereDir;
-var virus;
+var viruses = [];
 var keys = [0, 0, 0, 0, 0]; // Up, Down, Left, Right, Jump!
 
 /***************************************************************************/
@@ -172,19 +172,22 @@ function init() {
     world.add(sphereBody);
     sphereMesh = new THREE.Mesh(
         new THREE.SphereGeometry(sphereRad, 100, 100),
-        new THREE.MeshPhongMaterial({ color: 0x347a1f })
+        new THREE.MeshPhongMaterial({ color: 0xffffff })
     );
     scene.add(sphereMesh);
     sphereBody.position.set(0, sphereRestHeight + EPS, 0);
     sphereMesh.position.set(0, sphereRestHeight + EPS, 0);
 
     // Create a virus.
-    virus = new Virus(
-        new THREE.Vector3(10, sphereRestHeight, 10),
-        slipperyMaterial,
-        world
-    );
-    scene.add(virus.mesh);
+    for (let i = 0; i < 10; i++) {
+        let virus = new Virus(
+            new THREE.Vector3(10 + i * 5, sphereRestHeight, 10 + i * 5),
+            slipperyMaterial,
+            world
+        );
+        viruses.push(virus)
+        scene.add(virus.mesh);
+    }
 }
 
 // Main animation loop.
@@ -205,15 +208,15 @@ function animate() {
     sphereMesh.position.copy(sphereBody.position);
     sphereMesh.quaternion.copy(sphereBody.quaternion);
 
-    // Update virus position.
-    virus.handleWallCollisions();
-    virus.mesh.position.copy(virus.body.position);
-    virus.mesh.quaternion.copy(virus.body.quaternion);
+    // Update grid cells and virus positions. 
+    for (let i = 0; i < viruses.length; i++) {
+        let virus = viruses[i];
+        virus.handleWallCollisions();
+        virus.mesh.position.copy(virus.body.position);
+        virus.mesh.quaternion.copy(virus.body.quaternion);
+        updateCellsForParticle(virus.mesh);
+    }
 
-    console.log(virus.body.velocity);
-
-    // Update grid cells
-    updateCellsForParticle(sphereMesh);
     renderer.render(scene, camera);
 }
 
@@ -293,7 +296,7 @@ function handleWallCollisions() {
 // Calculate the rebound velocity upon collision with a wall.
 function calculateVelocity(normal, velocity) {
     let dot = normal.dot(velocity.clone());
-    let c = normal.clone().scale(2 * dot);
+    let c = normal.clone().scale(3 * dot);
     return velocity.clone().vsub(c).scale(0.8);
 }
 
@@ -323,7 +326,7 @@ function applyImpluses() {
                     break;
                 case 4: // Jump! (only if not in the air).
                     if (sphereBody.position.y <= sphereRestHeight + EPS) {
-                        console.log("JUMPING!");
+                        // console.log("JUMPING!");
                         sphereBody.applyImpulse(
                             new CANNON.Vec3(0, 3, 0),
                             sphereBody.position
