@@ -91,7 +91,10 @@ class Virus {
         directions[index].normalize();
         directions[index] = directions[index].scale(10);
         this.body.applyImpulse(directions[index], this.body.position);
-        // setTimeout(this.randomWalk, 1000);
+        let me = this; 
+        setTimeout(function() {
+            me.randomWalk()
+        }, 1000);
     }
 }
 

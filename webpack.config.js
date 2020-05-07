@@ -1,41 +1,57 @@
-const path = require('path');
-const pkg = require('./package.json');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const buildPath = './build/';
+const path = require("path");
+const pkg = require("./package.json");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const buildPath = "./build/";
 
 module.exports = {
-    entry: ['./src/app.js'],
+    entry: ["./src/app.js"],
     output: {
         path: path.join(__dirname, buildPath),
-        filename: '[name].[hash].js',
+        filename: "[name].[hash].js",
         publicPath: `/${pkg.repository}/`,
     },
-    target: 'web',
-    devtool: 'source-map',
+    target: "web",
+    devtool: "source-map",
     module: {
         rules: [
             {
+                test: /\.css$/,
+                use: ["style-loader", "css-loader"],
+            },
+            {
+                test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+                use: [
+                    {
+                        loader: "file-loader",
+                        options: {
+                            name: "[name].[ext]",
+                            outputPath: "fonts/",
+                        },
+                    },
+                ],
+            },
+            {
                 test: /\.js$/,
-                use: 'babel-loader',
-                exclude: path.resolve(__dirname, './node_modules/'),
+                use: "babel-loader",
+                exclude: path.resolve(__dirname, "./node_modules/"),
             },
             {
                 test: /\.(jpe?g|png|gif|svg|tga|gltf|babylon|mtl|pcb|pcd|prwm|obj|mat|mp3|ogg)$/i,
-                use: 'file-loader',
-                exclude: path.resolve(__dirname, './node_modules/'),
+                use: "file-loader",
+                exclude: path.resolve(__dirname, "./node_modules/"),
             },
             {
                 test: /\.(vert|frag|glsl|shader|txt)$/i,
-                use: 'raw-loader',
-                exclude: path.resolve(__dirname, './node_modules/'),
+                use: "raw-loader",
+                exclude: path.resolve(__dirname, "./node_modules/"),
             },
             {
-                type: 'javascript/auto',
+                type: "javascript/auto",
                 test: /\.(json)/,
-                exclude: path.resolve(__dirname, './node_modules/'),
+                exclude: path.resolve(__dirname, "./node_modules/"),
                 use: [
                     {
-                        loader: 'file-loader',
+                        loader: "file-loader",
                     },
                 ],
             },
@@ -43,13 +59,14 @@ module.exports = {
     },
     resolve: {
         alias: {
-            virus$: path.resolve(__dirname, 'src/components/virus'),
-            lights$: path.resolve(__dirname, 'src/components/lights'),
-            objects$: path.resolve(__dirname, 'src/components/objects'),
-            scenes$: path.resolve(__dirname, 'src/components/scenes'),
+            menu$: path.resolve(__dirname, "src/components/menu"),
+            virus$: path.resolve(__dirname, "src/components/virus"),
+            lights$: path.resolve(__dirname, "src/components/lights"),
+            objects$: path.resolve(__dirname, "src/components/objects"),
+            scenes$: path.resolve(__dirname, "src/components/scenes"),
         },
     },
     plugins: [
-        new HtmlWebpackPlugin({ title: pkg.title, favicon: 'src/favicon.ico' }),
+        new HtmlWebpackPlugin({ title: pkg.title, favicon: "src/favicon.ico" }),
     ],
 };

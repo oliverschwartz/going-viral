@@ -3,8 +3,13 @@ import * as CANNON from "cannon";
 import { BasicLights } from "lights";
 import { updateCellsForParticle } from "./updateRender.js";
 import { Virus } from "virus";
+import { Menu } from "menu";
 const loader = new THREE.TextureLoader();
 const bgTexture = loader.load("../assets/bg.jpg");
+import 'bootstrap/dist/css/bootstrap.min.css';
+require('typeface-sigmar-one')
+
+
 
 /***************************************************************************/
 /* CONSTANTS AND VARIABLES */
@@ -57,6 +62,9 @@ function initCannon() {
 }
 
 function init() {
+    // Create a menu.
+    let menu = new Menu(); 
+
     // Initialize core ThreeJS components
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera();
