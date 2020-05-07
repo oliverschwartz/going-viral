@@ -27,6 +27,7 @@
     "cannon": "^0.6.2",
     "css-loader": "^3.5.3",
     "dat.gui": "^0.7.7",
+    "jquery": "^3.5.1",
     "style-loader": "^1.2.1",
     "three": "^0.115.0",
     "three-obj-loader": "^1.1.3",

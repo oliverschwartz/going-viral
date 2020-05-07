@@ -4,12 +4,11 @@ import { BasicLights } from "lights";
 import { updateCellsForParticle } from "./updateRender.js";
 import { Virus } from "virus";
 import { Menu } from "menu";
+import { Health } from "health";
 const loader = new THREE.TextureLoader();
 const bgTexture = loader.load("../assets/bg.jpg");
 import 'bootstrap/dist/css/bootstrap.min.css';
 require('typeface-sigmar-one')
-
-
 
 /***************************************************************************/
 /* CONSTANTS AND VARIABLES */
@@ -64,6 +63,8 @@ function initCannon() {
 function init() {
     // Create a menu.
     let menu = new Menu(); 
+    let health = new Health();
+
 
     // Initialize core ThreeJS components
     scene = new THREE.Scene();

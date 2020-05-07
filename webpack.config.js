@@ -59,6 +59,7 @@ module.exports = {
     },
     resolve: {
         alias: {
+            health$: path.resolve(__dirname, "src/components/health"),
             menu$: path.resolve(__dirname, "src/components/menu"),
             virus$: path.resolve(__dirname, "src/components/virus"),
             lights$: path.resolve(__dirname, "src/components/lights"),
@@ -67,6 +68,6 @@ module.exports = {
         },
     },
     plugins: [
-        new HtmlWebpackPlugin({ title: pkg.title, favicon: "src/favicon.ico" }),
+        new HtmlWebpackPlugin({ title: pkg.title, favicon: "src/favicon.ico", template: "src/index.html" }),
     ],
 };
