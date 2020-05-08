@@ -1,29 +1,35 @@
 import * as APP from "./app.js";
 
 export function updateCellsForParticle(particle) {
-  // Count scores
-  if (particle.position.z >= APP.height - APP.getplaneRad()) return;
+  if (particle.position.z >= APP.height - APP.planeRad) return;
+  if (particle.position.x == NaN || particle.position.z == NaN) return;
+
   let boxMeshes = APP.getFloor();
+  let sphereMesh = APP.getSphereMesh();
   var i = index(particle.position.x, particle.position.z);
-  const oldColor = boxMeshes[i].material.color;
-  // if (oldColor == 1) virus.score--;
-  // else if (oldColor == 2) antibody.score--;
-  // particle.score++;
+  // if particle is a white blood cell, update damage
+  if (particle === sphereMesh) {
+    const currColor = boxMeshes[i].material.color;
+    if (!currColor.equals(APP.planeColor)) {
+      debugger;
+      var health = APP.getHealth();
+      health.takeDamage(10);
+    }
+    return;
+  }
+  
 
-  // Updates grid to particle's color
-
+  // If particle is a virus, update grid to particle's color
   boxMeshes[i].material.color.set(particle.material.color);
 
   // Callback to change colour back after a few seconds. 
   setTimeout(function () {
     boxMeshes[i].material.color.set(0x75100e)
   }, 1000);
-  // floor color: 0x75100e
-  // arena.tileColors[i] = particle.num;
 }
 
 function index(x, z) {
-  let planeRad = APP.getplaneRad();
+  let planeRad = APP.planeRad;
   let index =
     Math.round(x / (planeRad * 2)) * (APP.height / (planeRad * 2)) +
     Math.round(z / (planeRad * 2));

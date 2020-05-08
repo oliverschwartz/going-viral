@@ -26,6 +26,7 @@ export const width = 20;
 export const height = 1000;
 export const planeRad = 1;
 export const virusMass = 1; 
+export const planeColor = new THREE.Color(0x75100e);
 const camDistXZ = 5;
 const camHeight = 3;
 const angle = (3 * Math.PI) / 180;
@@ -148,13 +149,9 @@ function init() {
       let z = j;
       let planeMesh = new THREE.Mesh(
         new THREE.PlaneGeometry(planeRad * 2, planeRad * 2, 1),
-        // new THREE.MeshBasicMaterial({
-        //   map: organTexture,
-        // })
         new THREE.MeshLambertMaterial({
           side: THREE.DoubleSide,
-          //   color: 0xd88383,
-          color: 0x75100e,
+          color: planeColor,
           opacity: 0.5,
           map: organTexture,
           transparent: true,
@@ -241,6 +238,9 @@ function animate() {
   handleWallCollisions();
   sphereMesh.position.copy(sphereBody.position);
   sphereMesh.quaternion.copy(sphereBody.quaternion);
+
+  // Check if sphere touches a viral tile
+  updateCellsForParticle(sphereMesh);
 
   // Update progress bar for sphere 
   progress.updateBar(sphereMesh.position.z);
@@ -421,6 +421,11 @@ function registerListeners() {
 export function getFloor() {
   return planeMeshes;
 }
-export function getplaneRad() {
-  return planeRad;
+
+export function getSphereMesh() {
+  return sphereMesh;
+}
+
+export function getHealth() {
+  return health; 
 }
