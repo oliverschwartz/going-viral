@@ -19,6 +19,7 @@ const impact = 10 ** -3;
 export const width = 20;
 export const height = 100;
 export const planeRad = 1;
+export const virusMass = 1; 
 const camDistXZ = 15;
 const camHeight = 10;
 const angle = (3 * Math.PI) / 180;
@@ -31,6 +32,7 @@ var planeMeshes = [],
     sphereRad,
     sphereDir;
 var viruses = [];
+var health;
 var keys = [0, 0, 0, 0, 0]; // Up, Down, Left, Right, Jump!
 
 /***************************************************************************/
@@ -63,8 +65,7 @@ function initCannon() {
 function init() {
     // Create a menu.
     let menu = new Menu(); 
-    let health = new Health();
-
+    health = new Health();
 
     // Initialize core ThreeJS components
     scene = new THREE.Scene();
@@ -187,6 +188,13 @@ function init() {
     sphereBody.position.set(0, sphereRestHeight + EPS, 0);
     sphereMesh.position.set(0, sphereRestHeight + EPS, 0);
 
+    // Add event listeners for losing health. 
+    sphereBody.addEventListener("collide", function(e) {
+        if (e.body.mass === virusMass) {
+            health.takeDamage(10);
+        }   
+    });
+
     // Create a virus.
     for (let i = 0; i < 10; i++) {
         let virus = new Virus(
@@ -227,6 +235,7 @@ function animate() {
     }
 
     renderer.render(scene, camera);
+
 }
 
 /***************************************************************************/
