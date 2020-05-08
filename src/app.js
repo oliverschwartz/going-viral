@@ -65,99 +65,105 @@ function initCannon() {
 }
 
 function init() {
-    // Create a menu.
-    let menu = new Menu(); 
-    let health = new Health();
+  // Create a menu.
+  let menu = new Menu(); 
+  let health = new Health();
 
+  // Initialize core ThreeJS components
+  scene = new THREE.Scene();
+  camera = new THREE.PerspectiveCamera();
+  renderer = new THREE.WebGLRenderer({ antialias: true });
 
-    // Initialize core ThreeJS components
-    scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera();
-    renderer = new THREE.WebGLRenderer({ antialias: true });
+  // Set up camera
+  camera.position.set(-camDistXZ, camHeight, 0);
+  camera.lookAt(new THREE.Vector3(0, 0, 0));
 
-    // Set up camera
-    camera.position.set(-camDistXZ, camHeight, 0);
-    camera.lookAt(new THREE.Vector3(0, 0, 0));
+  // Set up renderer, canvas, and minor CSS adjustments
+  renderer.setPixelRatio(window.devicePixelRatio);
+  const canvas = renderer.domElement;
+  canvas.style.display = "block"; // Removes padding below canvas
+  document.body.style.margin = 0; // Removes margin around page
+  document.body.style.overflow = "hidden"; // Fix scrolling
+  document.body.appendChild(canvas);
 
-    // Set up renderer, canvas, and minor CSS adjustments
-    renderer.setPixelRatio(window.devicePixelRatio);
-    const canvas = renderer.domElement;
-    canvas.style.display = "block"; // Removes padding below canvas
-    document.body.style.margin = 0; // Removes margin around page
-    document.body.style.overflow = "hidden"; // Fix scrolling
-    document.body.appendChild(canvas);
+  // Add some lights.
+  const lights = new BasicLights();
+  scene.add(lights);
+  //   scene.background = new THREE.Color(0x7ec0ee);
+  scene.background = bgTexture;
 
-    // Add some lights.
-    const lights = new BasicLights();
-    scene.add(lights);
-    //   scene.background = new THREE.Color(0x7ec0ee);
-    scene.background = bgTexture;
+  // Add event listeners.
+  registerListeners();
 
-    // Add event listeners.
-    registerListeners();
+  // Resize Handler
+  const windowResizeHandler = () => {
+    const { innerHeight, innerWidth } = window;
+    renderer.setSize(innerWidth, innerHeight);
+    camera.aspect = innerWidth / innerHeight;
+    camera.updateProjectionMatrix();
+  };
+  windowResizeHandler();
+  window.addEventListener("resize", windowResizeHandler, false);
 
-    // Resize Handler
-    const windowResizeHandler = () => {
-        const { innerHeight, innerWidth } = window;
-        renderer.setSize(innerWidth, innerHeight);
-        camera.aspect = innerWidth / innerHeight;
-        camera.updateProjectionMatrix();
-    };
-    windowResizeHandler();
-    window.addEventListener("resize", windowResizeHandler, false);
-
-    // Specify the slipperiness of surfaces.
-    let groundMaterial = new CANNON.Material("groundMaterial");
-    let slipperyMaterial = new CANNON.Material("slipperyMaterial");
-    let ground_slippery_cm = new CANNON.ContactMaterial(
-        groundMaterial,
-        slipperyMaterial,
-        {
-            friction: 0.0,
-            restitution: 1,
-            contactEquationStiffness: 1e8,
-            contactEquationRelaxation: 3,
-            frictionEquationStiffness: 1e8,
-            frictionEquationRegularizationTime: 3,
-        }
-    );
-    let ground_ground_cm = new CANNON.ContactMaterial(
-        groundMaterial,
-        groundMaterial,
-        {
-            friction: 0,
-            restitution: 1,
-            contactEquationStiffness: 1e8,
-            contactEquationRelaxation: 3,
-            frictionEquationStiffness: 1e8,
-            frictionEquationRegularizationTime: 3,
-        }
-    );
-    world.addContactMaterial(ground_slippery_cm);
-    world.addContactMaterial(ground_ground_cm);
-
-    // Add boxes on top of the plane.
-    for (let i = 0; i < width; i += planeRad * 2) {
-        for (let j = 0; j < height; j += planeRad * 2) {
-            let x = i;
-            let y = 0;
-            let z = j;
-            let planeMesh = new THREE.Mesh(
-                new THREE.PlaneGeometry(planeRad * 2, planeRad * 2, 1),
-                new THREE.MeshLambertMaterial({
-                    side: THREE.DoubleSide,
-                    color: 0x75100e,
-                })
-            );
-            scene.add(planeMesh);
-            planeMesh.position.set(x, y, z);
-            planeMesh.castShadow = true;
-            planeMesh.receiveShadow = true;
-            planeMesh.rotation.x = Math.PI / 2;
-            planeMeshes.push(planeMesh);
-        }
+  // Specify the slipperiness of surfaces.
+  let groundMaterial = new CANNON.Material("groundMaterial");
+  let slipperyMaterial = new CANNON.Material("slipperyMaterial");
+  let ground_slippery_cm = new CANNON.ContactMaterial(
+    groundMaterial,
+    slipperyMaterial,
+    {
+      friction: 0.0,
+      restitution: 1,
+      contactEquationStiffness: 1e8,
+      contactEquationRelaxation: 3,
+      frictionEquationStiffness: 1e8,
+      frictionEquationRegularizationTime: 3,
     }
-  
+  );
+  let ground_ground_cm = new CANNON.ContactMaterial(
+    groundMaterial,
+    groundMaterial,
+    {
+      friction: 0,
+      restitution: 1,
+      contactEquationStiffness: 1e8,
+      contactEquationRelaxation: 3,
+      frictionEquationStiffness: 1e8,
+      frictionEquationRegularizationTime: 3,
+    }
+  );
+  world.addContactMaterial(ground_slippery_cm);
+  world.addContactMaterial(ground_ground_cm);
+
+  // Add boxes on top of the plane.
+  for (let i = 0; i < width; i += planeRad * 2) {
+    for (let j = 0; j < height; j += planeRad * 2) {
+      let x = i;
+      let y = 0;
+      let z = j;
+      let planeMesh = new THREE.Mesh(
+        new THREE.PlaneGeometry(planeRad * 2, planeRad * 2, 1),
+        // new THREE.MeshBasicMaterial({
+        //   map: organTexture,
+        // })
+        new THREE.MeshLambertMaterial({
+          side: THREE.DoubleSide,
+          //   color: 0xd88383,
+          color: 0x75100e,
+          opacity: 0.5,
+          map: organTexture,
+          transparent: true,
+          emissive: 0x321616,
+        })
+      );
+      scene.add(planeMesh);
+      planeMesh.position.set(x, y, z);
+      planeMesh.castShadow = true;
+      planeMesh.receiveShadow = true;
+      planeMesh.rotation.x = Math.PI / 2;
+      planeMeshes.push(planeMesh);
+    }
+  }
 
   // Create 4 walls.
   createWall(height, new CANNON.Vec3(width, 1, height / 2 - planeRad));
