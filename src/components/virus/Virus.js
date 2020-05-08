@@ -31,7 +31,7 @@ class Virus {
         // Create the CANNON body.
         let shape = new CANNON.Sphere(this.radius);
         this.body = new CANNON.Body({
-            mass: 1,
+            mass: APP.virusMass,
             linearDamping: 0,
             angularDamping: 0,
             material: material,
