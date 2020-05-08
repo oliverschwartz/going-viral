@@ -38,8 +38,7 @@ var planeMeshes = [],
   sphereRad,
   sphereDir;
 var viruses = [];
-var health;
-var progress;
+var menu, health, progress;
 var keys = [0, 0, 0, 0, 0]; // Up, Down, Left, Right, Jump!
 
 /***************************************************************************/
@@ -70,10 +69,8 @@ function initCannon() {
 }
 
 function init() {
-  // Create a menu.
-  let menu = new Menu(); 
-
-  // Initialize health and progress
+  // Create various GUI elements. 
+  menu = new Menu(); 
   health = new Health();
   progress = new Progress(); 
 

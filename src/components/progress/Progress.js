@@ -8,7 +8,7 @@ class Progress {
     
     updateBar(position) {
         this.currPosition = position; 
-        let r = this.currPosition / (100/this.maxPosition); 
+        let r = Math.round(100 * this.currPosition / this.maxPosition); 
         console.log(r);
         $(".progress-bar").css("width", r + "%").text(r + " %");
     }
