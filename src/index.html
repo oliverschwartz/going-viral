@@ -20,41 +20,65 @@
             </div>
         </div>
         <div class="overlay" id="menu">
-            <div class="container overlayContent">
+            <!-- <div class="bg"></div> -->
+            <div id="instruction_menu">
+                <div id="instruction_btn_container">
+                    <div id="instruction_btn">
+                        X
+                    </div>
+                </div>
+                <div id="instruction_content">
+                    <h2
+                        id="instruction_content_title"
+                    >
+                        instructions
+                    </h2>
+                    <p class="instructions" id="instruction_content_text">
+                        You are a <span style="color: white;">healthy cell</span>
+                        - You <em>must</em> make it to your
+                        <span style="color: #ffd700;">destination</span> to ensure
+                        your survival!
+                        Avoid touching the
+                        <span style="color: #26ff52;"
+                            >viruses and the areas they infect</span
+                        >
+                        <br /><br />
+                        BEWARE: the better you do, the more aggressive the viruses
+                        will become
+                        <br /><br />
+                        Use your arrow keys to navigate through the space
+                    </p>
+    
+    
+                </div>
+            </div>
+            <div class="bg">
+                <div class="overlayContent">
                 <h1>
-                    <span style="color: #8a1007;">Welcome to </span
-                    ><span style="color: #ff1200; font-size: 45px;"
-                        >RONA RUN</span
-                    >
+                    <span style="color: #ffffff; font-size: 110px;">RONA</span
+                    ><span style="color: #5add61; font-size: 110px;">RUN</span>
                 </h1>
-                <h2
-                    style="color: #e33d67; padding-top: 2%; padding-bottom: 1%;"
-                >
-                    How to play
-                </h2>
-                <p class="instructions">
-                    You are a <span style="color: white;">healthy cell</span>
-                    <br />You <em>must</em> make it to your
-                    <span style="color: #ffd700;">destination</span> to ensure
-                    the survival of your organism <br />
-                    Avoid touching the
-                    <span style="color: #26ff52;"
-                        >viruses and the areas they infect</span
-                    >
-                    <br />
-                    BEWARE: the better you do, the more aggressive the viruses
-                    will become
-                </p>
                 <div>
                     <button
-                        class="btn btn-danger"
+                        class="start-button"
                         style="font-family: Sigmar One;"
                         id="start"
                     >
                         START GAME
                     </button>
                 </div>
+                <div>
+                    <button
+                        class="instructions_btn"
+                        style="font-family: Sigmar One; font-size: 25px;"
+                        id="instructions_btn"
+                    >
+                        instructions
+                    </button>
+                </div>
+            </div>
             </div>
         </div>
+    <!-- </div> -->
     </body>
 </html>
