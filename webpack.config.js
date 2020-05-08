@@ -59,6 +59,7 @@ module.exports = {
     },
     resolve: {
         alias: {
+            progress$: path.resolve(__dirname, "src/components/progress"),
             health$: path.resolve(__dirname, "src/components/health"),
             menu$: path.resolve(__dirname, "src/components/menu"),
             virus$: path.resolve(__dirname, "src/components/virus"),

@@ -2,7 +2,6 @@ class Health {
     constructor() {
         this.maxHealth = 500;
         this.curHealth = this.maxHealth;
-        $(".total").html(this.maxHealth + "/" + this.maxHealth);
         $(".health-bar-text").html("100%");
         $(".health-bar").css({
             width: "100%",
@@ -80,7 +79,7 @@ class Health {
         //Was going to have a game over/restart function here.
         $(".health-bar-red, .health-bar");
         $(".message-box").html(
-            "You've been knocked down! Thing's are looking bad."
+            "You've been knocked down! Things are looking bad."
         );
     }
 }

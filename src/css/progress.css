@@ -1,0 +1,47 @@
+.progress-div {
+    position: relative;
+    height: 90%; 
+}
+
+.progress {
+    position: absolute;
+    bottom: 0px; 
+}
+
+.progress-box {
+    background-color: #ccc;
+    height: 30px;
+    width: 200px;
+    margin: 0 auto;
+    border: solid 1px #aaa;
+}
+
+.progress-bar {
+    background-color: #007f00;
+    width: 100%;
+    height: 28px;
+    position: relative;
+    bottom: 56px;
+}
+
+.progress-bar-red {
+    width: 100%;
+    height: 100%;
+    background-color: #cc0000;
+}
+
+.progress-bar-blue {
+    width: 100%;
+    height: 100%;
+    background-color: #3bd3df;
+    bottom: 28px;
+    position: relative;
+}
+
+.progress-bar-text {
+    position: relative;
+    text-align: center;
+    color: #00ff23;
+    font-family: "Sigmar One";
+    bottom: 80px;
+}

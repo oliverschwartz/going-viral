@@ -5,6 +5,8 @@ import { updateCellsForParticle } from "./updateRender.js";
 import { Virus } from "virus";
 import { Menu } from "menu";
 import { Health } from "health";
+import { Progress } from "progress";
+
 const loader = new THREE.TextureLoader();
 const bgTexture = loader.load("../assets/bg.jpg");
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -37,6 +39,7 @@ var planeMeshes = [],
   sphereDir;
 var viruses = [];
 var health;
+var progress;
 var keys = [0, 0, 0, 0, 0]; // Up, Down, Left, Right, Jump!
 
 /***************************************************************************/
@@ -69,7 +72,10 @@ function initCannon() {
 function init() {
   // Create a menu.
   let menu = new Menu(); 
+
+  // Initialize health and progress
   health = new Health();
+  progress = new Progress(); 
 
   // Initialize core ThreeJS components
   scene = new THREE.Scene();
@@ -238,6 +244,9 @@ function animate() {
   handleWallCollisions();
   sphereMesh.position.copy(sphereBody.position);
   sphereMesh.quaternion.copy(sphereBody.quaternion);
+
+  // Update progress bar for sphere 
+  progress.updateBar(sphereMesh.position.z);
 
   // Update grid cells and virus positions.
   for (let i = 0; i < viruses.length; i++) {
