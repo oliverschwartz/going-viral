@@ -299,6 +299,7 @@ function animate() {
 
       // Reset health and progress
       health = new Health();
+      health.applyChange();
       progress = new Progress();
       progress.updateBar();
 
@@ -469,7 +470,7 @@ function registerListeners() {
         if (e.key === " ") {
           keys[4] = 1;
         }
-        if (e.key === "r") {
+        if (e.key === "r" && progress.state == "win") {
           // reset the game
           state = "reset";
         }
