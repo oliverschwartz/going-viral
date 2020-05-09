@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import * as CANNON from "cannon";
 import { BasicLights } from "lights";
-import { updateCellsForParticle } from "./updateRender.js";
+import { updateCellsForParticle, resetRender } from "./updateRender.js";
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import { Virus } from "virus";
 import { Menu } from "menu";
@@ -28,7 +28,7 @@ export const height = 1000;
 export const planeRad = 1;
 export const virusMass = 1;
 export const planeColor = new THREE.Color(0x75100e);
-export var scene; 
+export var scene;
 const dt = 1 / 60;
 const camDistXZ = 5;
 const camHeight = 3;
@@ -75,7 +75,7 @@ function initCannon() {
 
 function init() {
   // Create various GUI elements.
-  menu = new Menu();
+  // menu = new Menu();
   health = new Health();
   progress = new Progress();
 
@@ -159,8 +159,7 @@ function init() {
           opacity: 0.5,
           map: organTexture,
           transparent: true,
-          emissive: 0x321616,
-          castShadow: true
+          emissive: 0x321616
         })
       );
       scene.add(planeMesh);
@@ -208,21 +207,20 @@ function init() {
   let loader = new OBJLoader();
   console.log("before callback");
   loader.load(
-      'glbs/1408 White Blood Cell.obj',
-      function (object) {
-          scene.remove(sphereMesh);
-          sphereMesh = object.children[0].clone();
-          sphereMesh.geometry.scale(objScale, objScale, objScale);
-          sphereMesh.geometry.center();
-          sphereMesh.position.set(0, sphereRestHeight + EPS, 0);
-          sphereMesh.castShadow = true;
-          scene.add(sphereMesh);
-  });
-
+    'glbs/1408 White Blood Cell.obj',
+    function (object) {
+      scene.remove(sphereMesh);
+      sphereMesh = object.children[0].clone();
+      sphereMesh.geometry.scale(objScale, objScale, objScale);
+      sphereMesh.geometry.center();
+      sphereMesh.position.set(0, sphereRestHeight + EPS, 0);
+      sphereMesh.castShadow = true;
+      scene.add(sphereMesh);
+    });
 
   // Add event listeners for health damage.
   sphereBody.addEventListener("collide", function (e) {
-    if (e.body.mass == virusMass) {
+    if (e.body.mass == virusMass && health != null) {
       health.takeDamage(20);
     }
   });
@@ -248,36 +246,72 @@ function init() {
 
 // Main animation loop.
 function animate() {
-  window.requestAnimationFrame(animate);
-  world.step(dt);
+  switch (state) {
+    case 'menu': {
+      menu = new Menu();
+      state = 'play';
+      break;
+    }
 
-  // Check for user input.
-  applyImpluses();
+    case 'play': {
+      // initialize Health if starting game
+      if (health == null) health = new Health();
 
-  // Update the camera position.
-  focusCamera();
+      // update Cannon world 
+      world.step(dt);
 
-  // Handle wall collisions and update sphere positions.
-  handleWallCollisions();
-  sphereMesh.position.copy(sphereBody.position);
-  sphereMesh.quaternion.copy(sphereBody.quaternion);
+      // Check for user input.
+      applyImpluses();
 
-  // Check if sphere touches a viral tile
-  updateCellsForParticle(sphereMesh);
+      // Update the camera position.
+      focusCamera();
 
-  // Update progress bar for sphere
-  progress.updateBar(sphereMesh.position.z);
+      // Handle wall collisions and update sphere positions.
+      handleWallCollisions();
+      sphereMesh.position.copy(sphereBody.position);
+      sphereMesh.quaternion.copy(sphereBody.quaternion);
 
-  // Update grid cells and virus positions.
-  for (let i = 0; i < viruses.length; i++) {
-    let virus = viruses[i];
-    virus.handleWallCollisions();
-    virus.mesh.position.copy(virus.body.position);
-    virus.mesh.quaternion.copy(virus.body.quaternion);
-    updateCellsForParticle(virus.mesh);
+      // Check if sphere touches a viral tile
+      updateCellsForParticle(sphereMesh);
+
+      // Update progress bar for sphere
+      progress.updateBar(sphereMesh.position.z);
+
+      // Update grid cells and virus positions.
+      for (let i = 0; i < viruses.length; i++) {
+        let virus = viruses[i];
+        virus.handleWallCollisions();
+        virus.mesh.position.copy(virus.body.position);
+        virus.mesh.quaternion.copy(virus.body.quaternion);
+        updateCellsForParticle(virus.mesh);
+      }
+
+      renderer.render(scene, camera);
+      break;
+    }
+
+    case 'reset': {
+      // Reset physics 
+      sphereBody.position.set(0, sphereRestHeight + EPS, 0);
+      sphereBody.velocity = new CANNON.Vec3(0, 0, 0);
+      for (let virus of viruses) {
+        var newVirusPos = new THREE.Vector3(
+          10 + Math.floor(i * Math.random() * 5),
+          sphereRestHeight,
+          10 + i * 10
+        );
+        virus.body.position.set(newVirusPos.x, newVirusPos.y, newVirusPos.z);
+        virus.body.velocity = new CANNON.Vec3(0, 0, 0);
+      }
+
+      // Reset rendering 
+
+
+      state = 'menu';
+    }
+
   }
-
-  renderer.render(scene, camera);
+  window.requestAnimationFrame(animate);
 }
 
 /***************************************************************************/

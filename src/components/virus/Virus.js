@@ -13,7 +13,7 @@ const directions = {
   7: new CANNON.Vec3(-1, 0, -1),
 };
 
-const maxVelocity = 2.0; 
+const maxVelocity = 2.0;
 
 class Virus {
   constructor(position, material, world) {
@@ -30,17 +30,17 @@ class Virus {
     );
     this.mesh.position.set(position.x, position.y, position.z);
 
-        // Create the CANNON body.
-        let shape = new CANNON.Sphere(this.radius);
-        this.body = new CANNON.Body({
-            mass: APP.virusMass,
-            linearDamping: 0.5,
-            angularDamping: 0,
-            material: material,
-        });
-        this.body.addShape(shape);
-        this.body.position.set(position.x, position.y, position.z);
-        world.add(this.body);
+    // Create the CANNON body.
+    let shape = new CANNON.Sphere(this.radius);
+    this.body = new CANNON.Body({
+      mass: APP.virusMass,
+      linearDamping: 0.5,
+      angularDamping: 0,
+      material: material,
+    });
+    this.body.addShape(shape);
+    this.body.position.set(position.x, position.y, position.z);
+    world.add(this.body);
 
     this.randomWalk();
   }
@@ -57,15 +57,15 @@ class Virus {
       );
     }
 
-    calculateVelocity(normal, velocity) {
-        let dot = normal.dot(velocity.clone());
-        let c = normal.clone().scale(3 * dot);
-        let newVelocity = velocity.clone().vsub(c).scale(1);
-        newVelocity.x = Math.min(maxVelocity, newVelocity.x);
-        newVelocity.y = Math.min(maxVelocity, newVelocity.y);
-        newVelocity.z = Math.min(maxVelocity, newVelocity.z);
-        return newVelocity;
+    // -x wall
+    if (this.body.position.x < APP.EPS) {
+      this.body.position.x = APP.EPS;
+      this.body.velocity = this.calculateVelocity(
+        new CANNON.Vec3(-1, 0, 0),
+        velocity
+      );
     }
+
     // +z wall
     if (this.body.position.z > APP.height - APP.planeRad - this.radius) {
       this.body.position.z = APP.height - APP.planeRad - this.radius - APP.EPS;
@@ -87,7 +87,11 @@ class Virus {
   calculateVelocity(normal, velocity) {
     let dot = normal.dot(velocity.clone());
     let c = normal.clone().scale(3 * dot);
-    return velocity.clone().vsub(c).scale(1);
+    let newVelocity = velocity.clone().vsub(c).scale(1);
+    newVelocity.x = Math.min(maxVelocity, newVelocity.x);
+    newVelocity.y = Math.min(maxVelocity, newVelocity.y);
+    newVelocity.z = Math.min(maxVelocity, newVelocity.z);
+    return newVelocity;
   }
 
   randomWalk() {

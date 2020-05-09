@@ -1,5 +1,9 @@
 import * as APP from "./app.js";
 
+export function resetRender() {
+  
+}
+
 export function updateCellsForParticle(particle) {
   if (particle.position.z >= APP.height - APP.planeRad) return;
   if (particle.position.x == NaN || particle.position.z == NaN) return;
@@ -11,7 +15,6 @@ export function updateCellsForParticle(particle) {
   if (particle === sphereMesh) {
     const currColor = boxMeshes[i].material.color;
     if (!currColor.equals(APP.planeColor)) {
-      // debugger;
       var health = APP.getHealth();
       health.takeDamage(2);
     }
