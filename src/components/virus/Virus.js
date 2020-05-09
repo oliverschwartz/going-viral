@@ -57,15 +57,6 @@ class Virus {
       );
     }
 
-    calculateVelocity(normal, velocity) {
-        let dot = normal.dot(velocity.clone());
-        let c = normal.clone().scale(3 * dot);
-        let newVelocity = velocity.clone().vsub(c).scale(1);
-        newVelocity.x = Math.min(maxVelocity, newVelocity.x);
-        newVelocity.y = Math.min(maxVelocity, newVelocity.y);
-        newVelocity.z = Math.min(maxVelocity, newVelocity.z);
-        return newVelocity;
-    }
     // +z wall
     if (this.body.position.z > APP.height - APP.planeRad - this.radius) {
       this.body.position.z = APP.height - APP.planeRad - this.radius - APP.EPS;
@@ -87,6 +78,10 @@ class Virus {
   calculateVelocity(normal, velocity) {
     let dot = normal.dot(velocity.clone());
     let c = normal.clone().scale(3 * dot);
+    let newVelocity = velocity.clone().vsub(c).scale(1);
+    newVelocity.x = Math.min(maxVelocity, newVelocity.x);
+    newVelocity.y = Math.min(maxVelocity, newVelocity.y);
+    newVelocity.z = Math.min(maxVelocity, newVelocity.z);
     return velocity.clone().vsub(c).scale(1);
   }
 
