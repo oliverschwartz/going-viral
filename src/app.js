@@ -28,12 +28,16 @@ export const height = 1000;
 export const planeRad = 1;
 export const virusMass = 1;
 export const planeColor = new THREE.Color(0x75100e);
+<<<<<<< HEAD
 export var scene;
+=======
+export const sphereRestHeight = 0.5;
+export var scene; 
+>>>>>>> 95f7475bb5473ac83b904fe4f17d4f549a6c555f
 const dt = 1 / 60;
 const camDistXZ = 5;
-const camHeight = 3;
+const camHeightAbove = 3.5;
 const angle = (3 * Math.PI) / 180;
-const sphereRestHeight = 0.5;
 var world;
 var controls, renderer, scene, camera;
 var planeMeshes = [],
@@ -59,7 +63,7 @@ animate();
 // Initialize our CANNON physics engine.
 function initCannon() {
   world = new CANNON.World();
-  world.gravity.set(0, -15, 0);
+  world.gravity.set(0, -20, 0);
   world.broadphase = new CANNON.NaiveBroadphase();
 
   // Create a plane (invisible, the blocks sit on this).
@@ -85,7 +89,7 @@ function init() {
   renderer = new THREE.WebGLRenderer({ antialias: true });
 
   // Set up camera
-  camera.position.set(-camDistXZ, camHeight, 0);
+  camera.position.set(-camDistXZ, camHeightAbove, 0);
   camera.lookAt(new THREE.Vector3(0, 0, 0));
 
   // Set up renderer, canvas, and minor CSS adjustments
@@ -205,8 +209,8 @@ function init() {
   sphereMesh.position.set(0, sphereRestHeight + EPS, 0);
 
   let loader = new OBJLoader();
-  console.log("before callback");
   loader.load(
+<<<<<<< HEAD
     'glbs/1408 White Blood Cell.obj',
     function (object) {
       scene.remove(sphereMesh);
@@ -217,6 +221,19 @@ function init() {
       sphereMesh.castShadow = true;
       scene.add(sphereMesh);
     });
+=======
+      'glbs/1408 White Blood Cell.obj',
+      function (object) {
+          scene.remove(sphereMesh);
+          sphereMesh = object.children[0].clone();
+          sphereMesh.geometry.scale(objScale, objScale, objScale);
+          sphereMesh.geometry.center();
+          sphereMesh.position.set(0, sphereRestHeight + EPS, 0);
+          sphereMesh.castShadow = true;
+          sphereMesh.material.color = new THREE.Color(0xfaf5e6)
+          scene.add(sphereMesh);
+  });
+>>>>>>> 95f7475bb5473ac83b904fe4f17d4f549a6c555f
 
   // Add event listeners for health damage.
   sphereBody.addEventListener("collide", function (e) {
@@ -237,7 +254,6 @@ function init() {
       world
     );
     viruses.push(virus);
-    scene.add(virus.mesh);
   }
 
   // Go to menu
@@ -349,7 +365,7 @@ function focusCamera() {
   let negDirection = sphereDir.clone().normalize().negate();
   negDirection = negDirection.multiplyScalar(camDistXZ);
   let destination = sphereMesh.position.clone().add(negDirection);
-  camera.position.set(destination.x, camHeight, destination.z);
+  camera.position.set(destination.x, sphereMesh.position.y + camHeightAbove, destination.z);
   camera.lookAt(sphereMesh.position);
 }
 
@@ -412,10 +428,9 @@ function applyImpluses() {
           focusCamera();
           break;
         case 4: // Jump! (only if not in the air).
-          if (sphereBody.position.y <= sphereRestHeight + EPS) {
-            // console.log("JUMPING!");
+          if (sphereBody.position.y <= sphereRestHeight) {
             sphereBody.applyImpulse(
-              new CANNON.Vec3(0, 3, 0),
+              new CANNON.Vec3(0, 5, 0),
               sphereBody.position
             );
           }
