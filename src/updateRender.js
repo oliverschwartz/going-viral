@@ -9,6 +9,10 @@ export function updateCellsForParticle(particle) {
   var i = index(particle.position.x, particle.position.z);
   // if particle is a white blood cell, update damage
   if (particle === sphereMesh) {
+    if (particle.position.y > APP.sphereRestHeight) {
+      return;
+    }
+
     const currColor = boxMeshes[i].material.color;
     if (!currColor.equals(APP.planeColor)) {
       // debugger;

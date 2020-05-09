@@ -28,12 +28,12 @@ export const height = 1000;
 export const planeRad = 1;
 export const virusMass = 1;
 export const planeColor = new THREE.Color(0x75100e);
+export const sphereRestHeight = 0.5;
 export var scene; 
 const dt = 1 / 60;
 const camDistXZ = 5;
 const camHeight = 3;
 const angle = (3 * Math.PI) / 180;
-const sphereRestHeight = 0.5;
 var world;
 var controls, renderer, scene, camera;
 var planeMeshes = [],
