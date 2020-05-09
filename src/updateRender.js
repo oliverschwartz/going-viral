@@ -11,20 +11,19 @@ export function updateCellsForParticle(particle) {
   if (particle === sphereMesh) {
     const currColor = boxMeshes[i].material.color;
     if (!currColor.equals(APP.planeColor)) {
-      debugger;
+      // debugger;
       var health = APP.getHealth();
-      health.takeDamage(10);
+      health.takeDamage(2);
     }
     return;
   }
-  
 
   // If particle is a virus, update grid to particle's color
   boxMeshes[i].material.color.set(particle.material.color);
 
-  // Callback to change colour back after a few seconds. 
+  // Callback to change colour back after a few seconds.
   setTimeout(function () {
-    boxMeshes[i].material.color.set(0x75100e)
+    boxMeshes[i].material.color.set(0x75100e);
   }, 1000);
 }
 

@@ -1,11 +1,49 @@
 .progress-div {
-    position: absolute;
-    text-align: center;
-    bottom: 2%; 
-    height: 30px; 
-    width: 100%; 
+  position: absolute;
+  text-align: center;
+  bottom: 4%;
+  height: 30px;
+  width: 100%;
+}
+#container-override-bootstrap {
+  height: 3rem;
+}
+
+#progress-override-bootstrap {
+  background-color: rgb(232, 53, 44);
+  padding: 0 1% 0 1%;
+  z-index: 0;
 }
 
 .progress-bar {
-    min-width: 30px;
+  min-width: 30px;
+}
+
+.progress-bar-icons {
+  width: 92%;
+  height: 100%;
+  display: flex;
+}
+
+.progress-bar-star {
+  background-image: url("../../assets/star.png");
+  background-repeat: no-repeat;
+  background-size: 1.4rem 1.4rem;
+  position: relative;
+  left: 99%;
+  top: 0.8rem;
+  height: 20px;
+  width: 20px;
+  display: inline-block;
+}
+
+.progress-bar-circle {
+  position: relative;
+  left: 2%;
+  top: 0.7rem;
+  height: 1.5rem;
+  width: 1.5rem;
+  background-color: white;
+  border-radius: 50%;
+  display: inline-block;
 }

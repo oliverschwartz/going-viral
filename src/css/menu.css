@@ -47,7 +47,7 @@ h2 {
 }
 
 .overlay {
-  display: flex;
+  display: none;
   height: 100%;
   width: 100%;
   position: fixed;

@@ -9,8 +9,8 @@ import { Progress } from "progress";
 
 const loader = new THREE.TextureLoader();
 const bgTexture = loader.load("../assets/bg.jpg");
-import 'bootstrap/dist/css/bootstrap.min.css';
-require('typeface-sigmar-one')
+import "bootstrap/dist/css/bootstrap.min.css";
+require("typeface-sigmar-one");
 const organTexture = new THREE.TextureLoader().load("../assets/organ.jpg");
 const lineTexture = new THREE.TextureLoader().load("../assets/texture.jpg");
 const cellTexture = new THREE.TextureLoader().load("../assets/cell.jpg");
@@ -25,7 +25,7 @@ const impact = 10 ** -3;
 export const width = 20;
 export const height = 1000;
 export const planeRad = 1;
-export const virusMass = 1; 
+export const virusMass = 1;
 export const planeColor = new THREE.Color(0x75100e);
 const camDistXZ = 5;
 const camHeight = 3;
@@ -70,10 +70,10 @@ function initCannon() {
 }
 
 function init() {
-  // Create various GUI elements. 
-  menu = new Menu(); 
+  // Create various GUI elements.
+  menu = new Menu();
   health = new Health();
-  progress = new Progress(); 
+  progress = new Progress();
 
   // Initialize core ThreeJS components
   scene = new THREE.Scene();
@@ -200,12 +200,12 @@ function init() {
   sphereBody.position.set(0, sphereRestHeight + EPS, 0);
   sphereMesh.position.set(0, sphereRestHeight + EPS, 0);
 
-  // Add event listeners for health damage. 
-  sphereBody.addEventListener("collide", function(e) {
+  // Add event listeners for health damage.
+  sphereBody.addEventListener("collide", function (e) {
     if (e.body.mass == virusMass) {
-      health.takeDamage(10);
+      health.takeDamage(20);
     }
-  })
+  });
 
   // Create a virus.
   for (let i = 0; i < 100; i++) {
@@ -242,7 +242,7 @@ function animate() {
   // Check if sphere touches a viral tile
   updateCellsForParticle(sphereMesh);
 
-  // Update progress bar for sphere 
+  // Update progress bar for sphere
   progress.updateBar(sphereMesh.position.z);
 
   // Update grid cells and virus positions.
@@ -427,5 +427,5 @@ export function getSphereMesh() {
 }
 
 export function getHealth() {
-  return health; 
+  return health;
 }

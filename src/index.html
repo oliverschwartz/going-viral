@@ -15,12 +15,15 @@
             </div>
         </div>
         <div class="progress-div">
-            <div class="container" style="height: 100%">
+            <div class="container" id="container-override-bootstrap" >
                 <div class="row" style="height: 100%">
                     <div class="col"></div>
                     <div class="col-6" style="height: 100%">
-                        <div class="progress" style="height: 100%;">
-                            <div class="progress-bar bg-success" role="progressbar" style="font-family: 'Sigmar One'; color: #26ff52";></div>
+                        <div class="progress" id="progress-override-bootstrap" style="height: 100%;">
+                            <!-- <div class="progress-bar bg-success" role="progressbar" style="font-family: 'Sigmar One'; color: #26ff52";></div> -->
+                           <div class="progress-bar-icons">
+                            <div class="progress-bar-circle"></div>
+                            <div class="progress-bar-star"></div></div>
                         </div>
                     </div>
                     <div class="col"></div>
@@ -28,7 +31,6 @@
             </div>
         </div>
         <div class="overlay" id="menu">
-            <!-- <div class="bg"></div> -->
             <div id="instruction_menu">
                 <div id="instruction_btn_container">
                     <div id="instruction_btn">
@@ -87,6 +89,5 @@
             </div>
             </div>
         </div>
-    <!-- </div> -->
     </body>
 </html>
