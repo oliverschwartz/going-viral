@@ -37,7 +37,8 @@ var planeMeshes = [],
   sphereMesh,
   sphereBody,
   sphereRad,
-  sphereDir;
+  sphereDir,
+  state;
 var viruses = [];
 var menu, health, progress;
 var keys = [0, 0, 0, 0, 0]; // Up, Down, Left, Right, Jump!
@@ -156,6 +157,7 @@ function init() {
           map: organTexture,
           transparent: true,
           emissive: 0x321616,
+          castShadow: true
         })
       );
       scene.add(planeMesh);
@@ -221,6 +223,9 @@ function init() {
     viruses.push(virus);
     scene.add(virus.mesh);
   }
+
+  // Go to menu
+  state = 'menu';
 }
 
 // Main animation loop.
@@ -338,7 +343,7 @@ function applyImpluses() {
   for (let i = 0; i < keys.length; i++) {
     if (keys[i] == 1) {
       switch (
-        i // UpArrow
+      i // UpArrow
       ) {
         case 0: // Apply forward impulse.
           sphereBody.applyImpulse(impulseVec, sphereBody.position);
