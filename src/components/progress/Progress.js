@@ -10,6 +10,9 @@ class Progress {
     this.currPosition = position;
     let r = (100 * this.currPosition) / this.maxPosition;
     $(".progress-bar-circle").css("left", r + "%");
+    if (r > 99) {
+      $(".win").css("display", "flex");
+    }
   }
 }
 
