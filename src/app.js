@@ -256,6 +256,14 @@ function animate() {
     case "play": {
       // initialize Health if starting game
       if (health == null) health = new Health();
+      if (progress.r > 90 && progress.state != "gameover") {
+        menu.showWin();
+        progress.state = "win";
+      }
+      if (health.curHealth == 0 && progress.state != "win") {
+        progress.state = "gameover";
+        menu.showGameover();
+      }
 
       // update Cannon world
       world.step(dt);
@@ -291,6 +299,8 @@ function animate() {
     }
 
     case "reset": {
+      menu.clearWin();
+      menu.clearGameover();
       // Reset physics of sphere
       sphereBody.position.set(0, sphereRestHeight + EPS, 0);
       sphereBody.velocity = new CANNON.Vec3(0, 0, 0);
@@ -470,7 +480,10 @@ function registerListeners() {
         if (e.key === " ") {
           keys[4] = 1;
         }
-        if (e.key === "r" && progress.state == "win") {
+        if (
+          e.key === "r" &&
+          (progress.state == "win" || progress.state == "gameover")
+        ) {
           // reset the game
           state = "reset";
         }

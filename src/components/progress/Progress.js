@@ -5,18 +5,14 @@ class Progress {
     this.maxPosition = APP.height;
     this.currPosition = 0;
     this.state = "";
+    this.r = 0;
   }
 
   updateBar(position) {
     this.currPosition = position;
     let r = (100 * this.currPosition) / this.maxPosition;
     $(".progress-bar-circle").css("left", r + "%");
-    if (r > 90) {
-      $(".win").css("display", "flex");
-      this.state = "win";
-    } else if (r < 1) {
-      $(".win").css("display", "none");
-    }
+    this.r = r;
   }
 }
 

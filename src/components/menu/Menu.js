@@ -11,11 +11,27 @@ class Menu {
     });
     $("#start").click(function (e) {
       $("#menu").css("display", "none");
-      newState = 'play';
-      // stop event bubbling 
+      newState = "play";
+      // stop event bubbling
       e.stopImmediatePropagation();
     });
     this.newState = newState;
+  }
+
+  showGameover() {
+    $(".gameover").css("display", "flex");
+  }
+
+  clearGameover() {
+    $(".gameover").css("display", "none");
+  }
+
+  showWin() {
+    $(".win").css("display", "flex");
+  }
+
+  clearWin() {
+    $(".win").css("display", "none");
   }
 }
 
