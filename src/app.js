@@ -204,7 +204,6 @@ function init() {
   sphereMesh.position.set(0, sphereRestHeight + EPS, 0);
 
   let loader = new OBJLoader();
-  console.log("before callback");
   loader.load(
       'glbs/1408 White Blood Cell.obj',
       function (object) {
@@ -214,9 +213,9 @@ function init() {
           sphereMesh.geometry.center();
           sphereMesh.position.set(0, sphereRestHeight + EPS, 0);
           sphereMesh.castShadow = true;
+          sphereMesh.material.color = new THREE.Color(0xfaf5e6)
           scene.add(sphereMesh);
   });
-
 
   // Add event listeners for health damage.
   sphereBody.addEventListener("collide", function (e) {
@@ -237,7 +236,6 @@ function init() {
       world
     );
     viruses.push(virus);
-    scene.add(virus.mesh);
   }
 }
 
@@ -374,7 +372,6 @@ function applyImpluses() {
           break;
         case 4: // Jump! (only if not in the air).
           if (sphereBody.position.y <= sphereRestHeight) {
-            console.log("jumping");
             sphereBody.applyImpulse(
               new CANNON.Vec3(0, 5, 0),
               sphereBody.position
