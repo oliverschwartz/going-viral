@@ -1,0 +1,21 @@
+.gameover {
+  position: fixed;
+  z-index: 1;
+  height: 100%;
+  width: 100%;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  /* background-color: darkred; */
+  font-family: "Sigmar One";
+  color: white;
+  flex-direction: column;
+}
+
+.gameover-title {
+  font-size: 10rem;
+  -webkit-text-stroke: 2px black;
+}
+.gameover-text {
+  font-size: 2rem;
+}
