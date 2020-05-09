@@ -2,6 +2,7 @@ import * as THREE from "three";
 import * as CANNON from "cannon";
 import { BasicLights } from "lights";
 import { updateCellsForParticle } from "./updateRender.js";
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import { Virus } from "virus";
 import { Menu } from "menu";
 import { Health } from "health";
@@ -19,14 +20,16 @@ const cell2Texture = new THREE.TextureLoader().load("../assets/cell2.jpg");
 /***************************************************************************/
 /* CONSTANTS AND VARIABLES */
 
-const dt = 1 / 60;
 export const EPS = 0.05;
 const impact = 10 ** -3;
+const objScale = 0.05;
 export const width = 20;
 export const height = 1000;
 export const planeRad = 1;
 export const virusMass = 1;
 export const planeColor = new THREE.Color(0x75100e);
+export var scene; 
+const dt = 1 / 60;
 const camDistXZ = 5;
 const camHeight = 3;
 const angle = (3 * Math.PI) / 180;
@@ -201,6 +204,21 @@ function init() {
   scene.add(sphereMesh);
   sphereBody.position.set(0, sphereRestHeight + EPS, 0);
   sphereMesh.position.set(0, sphereRestHeight + EPS, 0);
+
+  let loader = new OBJLoader();
+  console.log("before callback");
+  loader.load(
+      'glbs/1408 White Blood Cell.obj',
+      function (object) {
+          scene.remove(sphereMesh);
+          sphereMesh = object.children[0].clone();
+          sphereMesh.geometry.scale(objScale, objScale, objScale);
+          sphereMesh.geometry.center();
+          sphereMesh.position.set(0, sphereRestHeight + EPS, 0);
+          sphereMesh.castShadow = true;
+          scene.add(sphereMesh);
+  });
+
 
   // Add event listeners for health damage.
   sphereBody.addEventListener("collide", function (e) {
