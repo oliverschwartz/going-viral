@@ -32,7 +32,7 @@ export const sphereRestHeight = 0.5;
 export var scene; 
 const dt = 1 / 60;
 const camDistXZ = 5;
-const camHeight = 3;
+const camHeightAbove = 3.5;
 const angle = (3 * Math.PI) / 180;
 var world;
 var controls, renderer, scene, camera;
@@ -58,7 +58,7 @@ animate();
 // Initialize our CANNON physics engine.
 function initCannon() {
   world = new CANNON.World();
-  world.gravity.set(0, -15, 0);
+  world.gravity.set(0, -20, 0);
   world.broadphase = new CANNON.NaiveBroadphase();
 
   // Create a plane (invisible, the blocks sit on this).
@@ -84,7 +84,7 @@ function init() {
   renderer = new THREE.WebGLRenderer({ antialias: true });
 
   // Set up camera
-  camera.position.set(-camDistXZ, camHeight, 0);
+  camera.position.set(-camDistXZ, camHeightAbove, 0);
   camera.lookAt(new THREE.Vector3(0, 0, 0));
 
   // Set up renderer, canvas, and minor CSS adjustments
@@ -310,7 +310,7 @@ function focusCamera() {
   let negDirection = sphereDir.clone().normalize().negate();
   negDirection = negDirection.multiplyScalar(camDistXZ);
   let destination = sphereMesh.position.clone().add(negDirection);
-  camera.position.set(destination.x, camHeight, destination.z);
+  camera.position.set(destination.x, sphereMesh.position.y + camHeightAbove, destination.z);
   camera.lookAt(sphereMesh.position);
 }
 
@@ -373,10 +373,10 @@ function applyImpluses() {
           focusCamera();
           break;
         case 4: // Jump! (only if not in the air).
-          if (sphereBody.position.y <= sphereRestHeight + EPS) {
-            // console.log("JUMPING!");
+          if (sphereBody.position.y <= sphereRestHeight) {
+            console.log("jumping");
             sphereBody.applyImpulse(
-              new CANNON.Vec3(0, 3, 0),
+              new CANNON.Vec3(0, 5, 0),
               sphereBody.position
             );
           }
