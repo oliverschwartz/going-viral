@@ -293,21 +293,33 @@ function animate() {
     }
 
     case 'reset': {
-      // Reset physics 
+      // Reset physics of sphere 
       sphereBody.position.set(0, sphereRestHeight + EPS, 0);
       sphereBody.velocity = new CANNON.Vec3(0, 0, 0);
+      // Reset rendering of sphere
+      sphereMesh.position.set(0, sphereRestHeight + EPS, 0);
+
+      // Reset health and progress
+      health = new Health();
+      progress = new Progress(); 
+
+      // Reset each virus 
       for (let virus of viruses) {
         var newVirusPos = new THREE.Vector3(
           10 + Math.floor(i * Math.random() * 5),
           sphereRestHeight,
           10 + i * 10
         );
+        // Reset physics
         virus.body.position.set(newVirusPos.x, newVirusPos.y, newVirusPos.z);
         virus.body.velocity = new CANNON.Vec3(0, 0, 0);
-      }
 
-      // Reset rendering 
+        // Reset rendering 
+        virus.mesh.position.set(newVirusPos.x, newVirusPos.y, newVirusPos.z);
 
+        // More random walking !
+        virus.randomWalk(); 
+      }    
       state = 'menu';
     }
 
@@ -486,8 +498,4 @@ export function getSphereMesh() {
 
 export function getHealth() {
   return health;
-}
-
-export function getState() {
-  return state;
 }
