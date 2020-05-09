@@ -1,7 +1,7 @@
 import * as APP from "./app.js";
 
 export function resetRender() {
-  
+
 }
 
 export function updateCellsForParticle(particle) {

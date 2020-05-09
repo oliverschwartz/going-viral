@@ -4,7 +4,7 @@ import { BasicLights } from "lights";
 import { updateCellsForParticle, resetRender } from "./updateRender.js";
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import { Virus } from "virus";
-import { Menu } from "menu";
+import * as MENU from "menu";
 import { Health } from "health";
 import { Progress } from "progress";
 
@@ -28,12 +28,8 @@ export const height = 1000;
 export const planeRad = 1;
 export const virusMass = 1;
 export const planeColor = new THREE.Color(0x75100e);
-<<<<<<< HEAD
 export var scene;
-=======
 export const sphereRestHeight = 0.5;
-export var scene; 
->>>>>>> 95f7475bb5473ac83b904fe4f17d4f549a6c555f
 const dt = 1 / 60;
 const camDistXZ = 5;
 const camHeightAbove = 3.5;
@@ -45,9 +41,11 @@ var planeMeshes = [],
   sphereBody,
   sphereRad,
   sphereDir,
-  state;
-var viruses = [];
-var menu, health, progress;
+  state,
+  viruses = [],
+  menu,
+  health,
+  progress;
 var keys = [0, 0, 0, 0, 0]; // Up, Down, Left, Right, Jump!
 
 /***************************************************************************/
@@ -79,8 +77,6 @@ function initCannon() {
 
 function init() {
   // Create various GUI elements.
-  // menu = new Menu();
-  health = new Health();
   progress = new Progress();
 
   // Initialize core ThreeJS components
@@ -209,8 +205,8 @@ function init() {
   sphereMesh.position.set(0, sphereRestHeight + EPS, 0);
 
   let loader = new OBJLoader();
+  console.log("before callback");
   loader.load(
-<<<<<<< HEAD
     'glbs/1408 White Blood Cell.obj',
     function (object) {
       scene.remove(sphereMesh);
@@ -221,19 +217,6 @@ function init() {
       sphereMesh.castShadow = true;
       scene.add(sphereMesh);
     });
-=======
-      'glbs/1408 White Blood Cell.obj',
-      function (object) {
-          scene.remove(sphereMesh);
-          sphereMesh = object.children[0].clone();
-          sphereMesh.geometry.scale(objScale, objScale, objScale);
-          sphereMesh.geometry.center();
-          sphereMesh.position.set(0, sphereRestHeight + EPS, 0);
-          sphereMesh.castShadow = true;
-          sphereMesh.material.color = new THREE.Color(0xfaf5e6)
-          scene.add(sphereMesh);
-  });
->>>>>>> 95f7475bb5473ac83b904fe4f17d4f549a6c555f
 
   // Add event listeners for health damage.
   sphereBody.addEventListener("collide", function (e) {
@@ -254,6 +237,7 @@ function init() {
       world
     );
     viruses.push(virus);
+    scene.add(virus.mesh);
   }
 
   // Go to menu
@@ -264,8 +248,10 @@ function init() {
 function animate() {
   switch (state) {
     case 'menu': {
-      menu = new Menu();
-      state = 'play';
+      menu = new MENU.Menu();
+      if (menu.newState == 'play') {
+        state = menu.newState;
+      }
       break;
     }
 
@@ -321,7 +307,6 @@ function animate() {
       }
 
       // Reset rendering 
-
 
       state = 'menu';
     }
@@ -428,7 +413,8 @@ function applyImpluses() {
           focusCamera();
           break;
         case 4: // Jump! (only if not in the air).
-          if (sphereBody.position.y <= sphereRestHeight) {
+          if (sphereBody.position.y <= sphereRestHeight + EPS) {
+            // console.log("JUMPING!");
             sphereBody.applyImpulse(
               new CANNON.Vec3(0, 5, 0),
               sphereBody.position
@@ -500,4 +486,8 @@ export function getSphereMesh() {
 
 export function getHealth() {
   return health;
+}
+
+export function getState() {
+  return state;
 }

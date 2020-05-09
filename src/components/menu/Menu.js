@@ -1,17 +1,21 @@
 import * as APP from "../../app.js";
 
+export var newState;
 class Menu {
   constructor() {
-    document.getElementById("start").onclick = function () {
-      document.getElementById("menu").style.display = "none";
-    };
-    document.getElementById("instructions_btn").onclick = function () {
-      document.getElementById("instruction_menu").style.display = "flex";
-    };
-    document.getElementById("instruction_btn").onclick = function () {
-      console.log("click");
-      document.getElementById("instruction_menu").style.display = "none";
-    };
+    $("#instructions_btn").click(function () {
+      $("#instruction_menu").css("display", "flex");
+    });
+    $("#instruction_btn").click(function () {
+      $("#instruction_menu").css("display", "none");
+    });
+    $("#start").click(function (e) {
+      $("#menu").css("display", "none");
+      newState = 'play';
+      // stop event bubbling 
+      e.stopImmediatePropagation();
+    });
+    this.newState = newState;
   }
 }
 

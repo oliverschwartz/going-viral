@@ -31,26 +31,23 @@ class Virus {
     );
     this.mesh.position.set(position.x, position.y, position.z);
 
-<<<<<<< HEAD
-=======
     var self = this;
     let loader = new OBJLoader();
     loader.load(
-        'glbs/1409 Virus.obj',
-        function (object) {
-            APP.scene.remove(self.mesh);
-            self.mesh = object.children[0].clone();
-            self.mesh.geometry.scale(0.05, 0.05, 0.05);
-            self.mesh.geometry.center();
-            self.mesh.position.set(position.x, position.y, position.z);
-            let color = new THREE.Color(0x95db4f);
-            color.g += (Math.random() - 1) * 0.25;
-            self.mesh.material.color = color;
-            self.mesh.castShadow = true;
-            APP.scene.add(self.mesh);
-    });
+      'glbs/1409 Virus.obj',
+      function (object) {
+        APP.scene.remove(self.mesh);
+        self.mesh = object.children[0].clone();
+        self.mesh.geometry.scale(0.05, 0.05, 0.05);
+        self.mesh.geometry.center();
+        self.mesh.position.set(position.x, position.y, position.z);
+        let color = new THREE.Color(0x95db4f);
+        color.g += (Math.random() - 1) * 0.25;
+        self.mesh.material.color = color;
+        self.mesh.castShadow = true;
+        APP.scene.add(self.mesh);
+      });
 
->>>>>>> 95f7475bb5473ac83b904fe4f17d4f549a6c555f
     // Create the CANNON body.
     let shape = new CANNON.Sphere(this.radius);
     this.body = new CANNON.Body({
@@ -62,10 +59,7 @@ class Virus {
     this.body.addShape(shape);
     this.body.position.set(position.x, position.y, position.z);
     world.add(this.body);
-<<<<<<< HEAD
-=======
     APP.scene.add(this.mesh);
->>>>>>> 95f7475bb5473ac83b904fe4f17d4f549a6c555f
 
     this.randomWalk();
   }
