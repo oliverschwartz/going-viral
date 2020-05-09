@@ -12,6 +12,8 @@ class Progress {
     $(".progress-bar-circle").css("left", r + "%");
     if (r > 99) {
       $(".win").css("display", "flex");
+    } else if (r < 1) {
+      $(".win").css("display", "none");
     }
   }
 }

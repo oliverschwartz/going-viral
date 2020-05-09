@@ -2,7 +2,7 @@ import * as THREE from "three";
 import * as CANNON from "cannon";
 import { BasicLights } from "lights";
 import { updateCellsForParticle, resetRender } from "./updateRender.js";
-import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
+import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import { Virus } from "virus";
 import * as MENU from "menu";
 import { Health } from "health";
@@ -32,7 +32,7 @@ export var scene;
 export const sphereRestHeight = 0.5;
 const dt = 1 / 60;
 const camDistXZ = 5;
-const camHeightAbove = 3.5;
+const camHeightAbove = 3;
 const angle = (3 * Math.PI) / 180;
 var world;
 var controls, renderer, scene, camera;
@@ -159,7 +159,7 @@ function init() {
           opacity: 0.5,
           map: organTexture,
           transparent: true,
-          emissive: 0x321616
+          emissive: 0x321616,
         })
       );
       scene.add(planeMesh);
@@ -206,17 +206,15 @@ function init() {
 
   let loader = new OBJLoader();
   console.log("before callback");
-  loader.load(
-    'glbs/1408 White Blood Cell.obj',
-    function (object) {
-      scene.remove(sphereMesh);
-      sphereMesh = object.children[0].clone();
-      sphereMesh.geometry.scale(objScale, objScale, objScale);
-      sphereMesh.geometry.center();
-      sphereMesh.position.set(0, sphereRestHeight + EPS, 0);
-      sphereMesh.castShadow = true;
-      scene.add(sphereMesh);
-    });
+  loader.load("glbs/1408 White Blood Cell.obj", function (object) {
+    scene.remove(sphereMesh);
+    sphereMesh = object.children[0].clone();
+    sphereMesh.geometry.scale(objScale, objScale, objScale);
+    sphereMesh.geometry.center();
+    sphereMesh.position.set(0, sphereRestHeight + EPS, 0);
+    sphereMesh.castShadow = true;
+    scene.add(sphereMesh);
+  });
 
   // Add event listeners for health damage.
   sphereBody.addEventListener("collide", function (e) {
@@ -241,25 +239,25 @@ function init() {
   }
 
   // Go to menu
-  state = 'menu';
+  state = "menu";
 }
 
 // Main animation loop.
 function animate() {
   switch (state) {
-    case 'menu': {
+    case "menu": {
       menu = new MENU.Menu();
-      if (menu.newState == 'play') {
+      if (menu.newState == "play") {
         state = menu.newState;
       }
       break;
     }
 
-    case 'play': {
+    case "play": {
       // initialize Health if starting game
       if (health == null) health = new Health();
 
-      // update Cannon world 
+      // update Cannon world
       world.step(dt);
 
       // Check for user input.
@@ -292,8 +290,8 @@ function animate() {
       break;
     }
 
-    case 'reset': {
-      // Reset physics of sphere 
+    case "reset": {
+      // Reset physics of sphere
       sphereBody.position.set(0, sphereRestHeight + EPS, 0);
       sphereBody.velocity = new CANNON.Vec3(0, 0, 0);
       // Reset rendering of sphere
@@ -301,28 +299,36 @@ function animate() {
 
       // Reset health and progress
       health = new Health();
-      progress = new Progress(); 
+      progress = new Progress();
+      progress.updateBar();
 
-      // Reset each virus 
-      for (let virus of viruses) {
+      // Reset each virus
+      for (let i = 0; i < viruses.length; i++) {
         var newVirusPos = new THREE.Vector3(
           10 + Math.floor(i * Math.random() * 5),
           sphereRestHeight,
           10 + i * 10
         );
         // Reset physics
-        virus.body.position.set(newVirusPos.x, newVirusPos.y, newVirusPos.z);
-        virus.body.velocity = new CANNON.Vec3(0, 0, 0);
+        viruses[i].body.position.set(
+          newVirusPos.x,
+          newVirusPos.y,
+          newVirusPos.z
+        );
+        viruses[i].body.velocity = new CANNON.Vec3(0, 0, 0);
 
-        // Reset rendering 
-        virus.mesh.position.set(newVirusPos.x, newVirusPos.y, newVirusPos.z);
+        // Reset rendering
+        viruses[i].mesh.position.set(
+          newVirusPos.x,
+          newVirusPos.y,
+          newVirusPos.z
+        );
 
         // More random walking !
-        virus.randomWalk(); 
-      }    
-      state = 'menu';
+        viruses[i].randomWalk();
+      }
+      state = "menu";
     }
-
   }
   window.requestAnimationFrame(animate);
 }
@@ -362,7 +368,11 @@ function focusCamera() {
   let negDirection = sphereDir.clone().normalize().negate();
   negDirection = negDirection.multiplyScalar(camDistXZ);
   let destination = sphereMesh.position.clone().add(negDirection);
-  camera.position.set(destination.x, sphereMesh.position.y + camHeightAbove, destination.z);
+  camera.position.set(
+    destination.x,
+    sphereMesh.position.y + camHeightAbove,
+    destination.z
+  );
   camera.lookAt(sphereMesh.position);
 }
 
@@ -408,7 +418,7 @@ function applyImpluses() {
   for (let i = 0; i < keys.length; i++) {
     if (keys[i] == 1) {
       switch (
-      i // UpArrow
+        i // UpArrow
       ) {
         case 0: // Apply forward impulse.
           sphereBody.applyImpulse(impulseVec, sphereBody.position);
@@ -458,6 +468,10 @@ function registerListeners() {
         }
         if (e.key === " ") {
           keys[4] = 1;
+        }
+        if (e.key === "r") {
+          // reset the game
+          state = "reset";
         }
       },
       false
