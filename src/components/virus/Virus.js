@@ -115,10 +115,13 @@ class Virus {
   }
 
   randomWalk() {
-    let index = Math.floor(8 * Math.random());
-    directions[index].normalize();
-    directions[index] = directions[index].scale(10);
-    this.body.applyImpulse(directions[index], this.body.position);
+    var state = APP.getState();
+    if (state == "play") {
+      let index = Math.floor(8 * Math.random());
+      directions[index].normalize();
+      directions[index] = directions[index].scale(10);
+      this.body.applyImpulse(directions[index], this.body.position);
+    }
     let me = this;
     setTimeout(function () {
       me.randomWalk();

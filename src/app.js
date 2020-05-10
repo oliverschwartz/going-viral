@@ -393,7 +393,7 @@ function focusCamera() {
 
 function handleWallCollisions() {
   let velocity = sphereBody.velocity.clone();
-  console.log(velocity);
+  // console.log(velocity);
   // +x wall
   if (sphereBody.position.x > width - planeRad - sphereRad) {
     sphereBody.position.x = width - planeRad - sphereRad - EPS;
@@ -556,4 +556,8 @@ export function getSphereMesh() {
 
 export function getHealth() {
   return health;
+}
+
+export function getState() {
+  return state;
 }
