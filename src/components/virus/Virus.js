@@ -103,13 +103,14 @@ class Virus {
     }
   }
 
+  // Calculate the rebound velocity upon collision with a wall.
   calculateVelocity(normal, velocity) {
     let dot = normal.dot(velocity.clone());
     let c = normal.clone().scale(3 * dot);
     let newVelocity = velocity.clone().vsub(c).scale(1);
-    newVelocity.x = Math.min(maxVelocity, newVelocity.x);
-    newVelocity.y = Math.min(maxVelocity, newVelocity.y);
-    newVelocity.z = Math.min(maxVelocity, newVelocity.z);
+    newVelocity.x = maxVelocity > Math.abs(newVelocity.x) ? maxVelocity : newVelocity.x;
+    newVelocity.y = maxVelocity > Math.abs(newVelocity.y) ? maxVelocity : newVelocity.y;
+    newVelocity.z = maxVelocity > Math.abs(newVelocity.z) ? maxVelocity : newVelocity.z;
     return newVelocity;
   }
 

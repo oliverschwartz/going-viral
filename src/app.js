@@ -256,10 +256,14 @@ function animate() {
     case "play": {
       // initialize Health if starting game
       if (health == null) health = new Health();
+
+      // Player wins!
       if (progress.r > 99 && progress.state != "gameover") {
         menu.showWin();
         progress.state = "win";
       }
+
+      // Game over ! :(
       if (health.curHealth == 0 && progress.state != "win") {
         progress.state = "gameover";
         menu.showGameover();
@@ -269,7 +273,7 @@ function animate() {
       world.step(dt);
 
       // Check for user input.
-      applyImpluses();
+      applyImpulses();
 
       // Update the camera position.
       focusCamera();
@@ -299,8 +303,10 @@ function animate() {
     }
 
     case "reset": {
+      // Clear current display screen
       menu.clearWin();
       menu.clearGameover();
+
       // Reset physics of sphere
       sphereBody.position.set(0, sphereRestHeight + EPS, 0);
       sphereBody.velocity = new CANNON.Vec3(0, 0, 0);
@@ -359,13 +365,6 @@ function createWall(length, position, rotate) {
     new THREE.MeshLambertMaterial({
       color: 0x75100e,
     })
-    // new THREE.MeshLambertMaterial({
-    //   side: THREE.DoubleSide,
-    //   //   color: 0xd88383,
-    //   color: 0x75100e,
-    //   opacity: 0.5,
-    //   map: organTexture,
-    // })
   );
   scene.add(wallMesh);
   wallMesh.position.set(position.x, position.y, position.z);
@@ -389,7 +388,7 @@ function focusCamera() {
 
 function handleWallCollisions() {
   let velocity = sphereBody.velocity.clone();
-
+  console.log(velocity);
   // +x wall
   if (sphereBody.position.x > width - planeRad - sphereRad) {
     sphereBody.position.x = width - planeRad - sphereRad - EPS;
@@ -417,35 +416,40 @@ function handleWallCollisions() {
 
 // Calculate the rebound velocity upon collision with a wall.
 function calculateVelocity(normal, velocity) {
+  var maxVelocity = 60.0;
   let dot = normal.dot(velocity.clone());
   let c = normal.clone().scale(3 * dot);
-  return velocity.clone().vsub(c).scale(0.8);
+  let newVelocity = velocity.clone().vsub(c).scale(0.8);
+  newVelocity.x = Math.min(maxVelocity, newVelocity.x);
+  newVelocity.y = Math.min(maxVelocity, newVelocity.y);
+  newVelocity.z = Math.min(maxVelocity, newVelocity.z);
+  return newVelocity;
 }
 
-function applyImpluses() {
+function applyImpulses() {
   let impulseVec = new CANNON.Vec3(sphereDir.x, 0, sphereDir.z);
   impulseVec.scale(impact);
 
   for (let i = 0; i < keys.length; i++) {
     if (keys[i] == 1) {
       switch (
-        i // UpArrow
+        i 
       ) {
-        case 0: // Apply forward impulse.
+        case 0: // Apply forward impulse if ArrowUp
           sphereBody.applyImpulse(impulseVec, sphereBody.position);
           break;
-        case 1: // Apply backward impulse.
+        case 1: // Apply backward impulse if ArrowDown
           sphereBody.applyImpulse(impulseVec.negate(), sphereBody.position);
           break;
-        case 2: // Change the ball's direction; update camera.
+        case 2: // Change the ball's direction, update camera if ArrowRight
           sphereDir.applyEuler(new THREE.Euler(0, -angle, 0));
           focusCamera();
           break;
-        case 3: // Change the ball's direction; update camera.
+        case 3: // Change the ball's direction; update camera if ArrowLeft
           sphereDir.applyEuler(new THREE.Euler(0, angle, 0));
           focusCamera();
           break;
-        case 4: // Jump! (only if not in the air).
+        case 4: // Jump! (only if not in the air) if Spacebar
           if (sphereBody.position.y <= sphereRestHeight + EPS) {
             // console.log("JUMPING!");
             sphereBody.applyImpulse(

@@ -17,6 +17,7 @@ class Menu {
     });
     this.newState = newState;
   }
+  
   startGame() {
     $("#menu").css("display", "none");
     newState = "play";
