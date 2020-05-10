@@ -1,3 +1,5 @@
+import * as APP from "../../app.js";
+
 class Health {
   constructor() {
     this.maxHealth = 500;
@@ -9,6 +11,7 @@ class Health {
   }
 
   takeDamage(damage) {
+    APP.damageSound.play();
     $(".health-bar-red, .health-bar").stop();
     this.curHealth = this.curHealth - damage;
     if (this.curHealth < 0) {

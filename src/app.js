@@ -29,6 +29,8 @@ export const planeRad = 1;
 export const virusMass = 1;
 export const planeColor = new THREE.Color(0x75100e);
 export var scene;
+export var damageSound;
+export var shrekSound;
 export const sphereRestHeight = 0.5;
 const dt = 1 / 60;
 const camDistXZ = 5;
@@ -83,6 +85,9 @@ function init() {
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera();
   renderer = new THREE.WebGLRenderer({ antialias: true });
+
+  // Add some sound.
+  addSounds();
 
   // Set up camera
   camera.position.set(-camDistXZ, camHeightAbove, 0);
@@ -432,9 +437,7 @@ function applyImpulses() {
 
   for (let i = 0; i < keys.length; i++) {
     if (keys[i] == 1) {
-      switch (
-        i 
-      ) {
+      switch (i) {
         case 0: // Apply forward impulse if ArrowUp
           sphereBody.applyImpulse(impulseVec, sphereBody.position);
           break;
@@ -522,6 +525,25 @@ function registerListeners() {
       false
     );
   })();
+}
+
+function addSounds() {
+  let audioListener = new THREE.AudioListener();
+  camera.add(audioListener);
+  
+  damageSound = new THREE.Audio(audioListener);
+  let soundLoader = new THREE.AudioLoader();
+  soundLoader.load("audio/damage.mp3", function (audioBuffer) {
+    damageSound.setBuffer(audioBuffer);
+  });
+  
+  shrekSound = new THREE.Audio(audioListener);
+  soundLoader.load("audio/shreksophone.mp3", function (audioBuffer) {
+    shrekSound.setBuffer(audioBuffer);
+    shrekSound.setLoop(true);
+    shrekSound.setVolume(0.5);
+    shrekSound.play();
+  });
 }
 
 export function getFloor() {
