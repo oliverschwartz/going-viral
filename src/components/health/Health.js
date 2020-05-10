@@ -9,14 +9,10 @@ class Health {
   }
 
   takeDamage(damage) {
-    // if (this.curHealth == 0) {
-    //   $(".gameover").css("display", "flex");
-    // } else {
     $(".health-bar-red, .health-bar").stop();
     this.curHealth = this.curHealth - damage;
     if (this.curHealth < 0) {
       this.curHealth = 0;
-      // restart();
     } else {
       $(".message-box").html("You took " + damage + " points of damage!");
     }

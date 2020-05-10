@@ -1,8 +1,6 @@
 import * as APP from "./app.js";
 
-export function resetRender() {
-
-}
+export function resetRender() {}
 
 export function updateCellsForParticle(particle) {
   if (particle.position.z >= APP.height - APP.planeRad) return;
@@ -20,7 +18,7 @@ export function updateCellsForParticle(particle) {
     const currColor = boxMeshes[i].material.color;
     if (!currColor.equals(APP.planeColor)) {
       var health = APP.getHealth();
-      health.takeDamage(2);
+      health.takeDamage(5);
     }
     return;
   }

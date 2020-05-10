@@ -219,7 +219,7 @@ function init() {
   // Add event listeners for health damage.
   sphereBody.addEventListener("collide", function (e) {
     if (e.body.mass == virusMass && health != null) {
-      health.takeDamage(20);
+      health.takeDamage(30);
     }
   });
 
@@ -256,7 +256,7 @@ function animate() {
     case "play": {
       // initialize Health if starting game
       if (health == null) health = new Health();
-      if (progress.r > 90 && progress.state != "gameover") {
+      if (progress.r > 99 && progress.state != "gameover") {
         menu.showWin();
         progress.state = "win";
       }
@@ -486,6 +486,10 @@ function registerListeners() {
         ) {
           // reset the game
           state = "reset";
+        }
+        if (e.key === "Enter" && state == "menu") {
+          console.log("working");
+          menu.startGame();
         }
       },
       false
