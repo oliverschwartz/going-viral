@@ -4,6 +4,7 @@ import { BasicLights } from "lights";
 import { updateCellsForParticle, resetRender } from "./updateRender.js";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import { Virus } from "virus";
+import { Boss } from "boss";
 import * as MENU from "menu";
 import { Health } from "health";
 import { Progress } from "progress";
@@ -26,20 +27,23 @@ export const width = 20;
 export const height = 1000;
 export const planeRad = 1;
 export const virusMass = 1;
+export const bossMass = 20;
 export const planeColor = new THREE.Color(0x75100e);
 export var scene;
 export var damageSound;
 export var shrekSound;
 export const sphereRestHeight = 0.5;
+export const bossRestHeight = 2.5;
+var boss;
 const dt = 1 / 60;
 const camDistXZ = 5;
 const camHeightAbove = 3;
 const angle = (3 * Math.PI) / 180;
 var world;
 var controls, renderer, scene, camera;
+export var sphereBody; 
 var planeMeshes = [],
   sphereMesh,
-  sphereBody,
   sphereRad,
   sphereDir,
   state,
@@ -222,7 +226,10 @@ function init() {
 
   // Add event listeners for health damage.
   sphereBody.addEventListener("collide", function (e) {
-    if (e.body.mass == virusMass && health != null) {
+    if (
+      (e.body.mass == virusMass || e.body.mass == bossMass) &&
+      health != null
+    ) {
       health.takeDamage(30);
     }
   });
@@ -241,6 +248,14 @@ function init() {
     viruses.push(virus);
     scene.add(virus.mesh);
   }
+
+  // Create a boss virus.
+  boss = new Boss(
+    new THREE.Vector3(width / 2, bossRestHeight, height / 2),
+    slipperyMaterial,
+    world
+  );
+  scene.add(boss.mesh);
 
   // Go to menu
   state = "menu";
@@ -301,6 +316,10 @@ function animate() {
         virus.mesh.quaternion.copy(virus.body.quaternion);
         updateCellsForParticle(virus.mesh);
       }
+
+      boss.handleWallCollisions();
+      boss.mesh.position.copy(boss.body.position);
+      boss.mesh.quaternion.copy(boss.body.quaternion);
 
       renderer.render(scene, camera);
       break;

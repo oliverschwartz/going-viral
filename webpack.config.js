@@ -64,6 +64,7 @@ module.exports = {
       health$: path.resolve(__dirname, "src/components/health"),
       menu$: path.resolve(__dirname, "src/components/menu"),
       virus$: path.resolve(__dirname, "src/components/virus"),
+      boss$: path.resolve(__dirname, "src/components/boss"),
       lights$: path.resolve(__dirname, "src/components/lights"),
       objects$: path.resolve(__dirname, "src/components/objects"),
       scenes$: path.resolve(__dirname, "src/components/scenes"),
