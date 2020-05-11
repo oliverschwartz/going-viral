@@ -1,5 +1,3 @@
-import * as APP from "../../app.js";
-
 export var newState;
 class Menu {
   constructor() {
@@ -17,7 +15,7 @@ class Menu {
     });
     this.newState = newState;
   }
-  
+
   startGame() {
     $("#menu").css("display", "none");
     newState = "play";

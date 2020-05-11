@@ -3,6 +3,7 @@ import * as CANNON from "cannon";
 import * as APP from "../../app.js";
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 
+
 const directions = {
   0: new CANNON.Vec3(1, 0, 0),
   1: new CANNON.Vec3(-1, 0, 0),

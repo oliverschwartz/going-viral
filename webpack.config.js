@@ -67,6 +67,7 @@ module.exports = {
       lights$: path.resolve(__dirname, "src/components/lights"),
       objects$: path.resolve(__dirname, "src/components/objects"),
       scenes$: path.resolve(__dirname, "src/components/scenes"),
+      perlin$: path.resolve(__dirname, "src/components/perlin"),
     },
   },
   plugins: [
