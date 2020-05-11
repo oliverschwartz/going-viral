@@ -8,7 +8,7 @@ import * as MENU from "menu";
 import { Health } from "health";
 import { Progress } from "progress";
 import ORGAN from "../assets/organ.jpg";
-import BACKGROUND from "../assets/organ.jpg";
+import BACKGROUND from "../assets/bg.jpg";
 
 const loader = new THREE.TextureLoader();
 const bgTexture = loader.load(BACKGROUND);
