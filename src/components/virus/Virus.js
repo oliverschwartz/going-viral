@@ -2,6 +2,7 @@ import * as THREE from "three";
 import * as CANNON from "cannon";
 import * as APP from "../../app.js";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
+import VIRUSOBJ from "../../../glbs/1409 Virus.obj";
 
 const directions = {
   0: new CANNON.Vec3(1, 0, 0),
@@ -32,7 +33,7 @@ class Virus {
 
     var self = this;
     let loader = new OBJLoader();
-    loader.load("glbs/1409 Virus.obj", function (object) {
+    loader.load(VIRUSOBJ, function (object) {
       APP.scene.remove(self.mesh);
       self.mesh = object.children[0].clone();
       self.mesh.geometry.scale(0.05, 0.05, 0.05);

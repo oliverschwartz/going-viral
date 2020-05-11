@@ -4,7 +4,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const buildPath = "./build/";
 
 module.exports = {
-  entry: ["./src/app.js"],
+  entry: { index: "./src/app.js" },
   output: {
     path: path.join(__dirname, buildPath),
     filename: "[name].[hash].js",
@@ -15,8 +15,11 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.css$/,
-        include: /stylesheets|node_modules/,
+        test: /\.obj$/i,
+        loader: "webpack-obj-loader",
+      },
+      {
+        test: /\.css$/i,
         use: ["style-loader", "css-loader"],
       },
       {

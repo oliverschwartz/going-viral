@@ -10,6 +10,15 @@ import { Health } from "health";
 import { Progress } from "progress";
 import ORGAN from "../assets/organ.jpg";
 import BACKGROUND from "../assets/bg.jpg";
+import ROUNDSHADOW from "../assets/roundshadow.png";
+
+import WHITECELLOBJ from "../glbs/1408 White Blood Cell.obj";
+
+import menuCSS from "./css/menu.css";
+import healthCSS from "./css/health.css";
+import progressCSS from "./css/progress.css";
+import winCSS from "./css/win.css";
+import gameoverCSS from "./css/gameover.css";
 
 const loader = new THREE.TextureLoader();
 const bgTexture = loader.load(BACKGROUND);
@@ -183,9 +192,9 @@ function init() {
 
   // Load the shadow texture.
   let shadowLoader = new THREE.TextureLoader();
-  let shadowTexture = shadowLoader.load("../assets/roundshadow.png");
+  let shadowTexture = shadowLoader.load(ROUNDSHADOW);
   shadowMesh = new THREE.Mesh(
-    new THREE.PlaneBufferGeometry(sphereRad*10, sphereRad*10),
+    new THREE.PlaneBufferGeometry(sphereRad * 10, sphereRad * 10),
     new THREE.MeshBasicMaterial({
       map: shadowTexture,
       transparent: true,
@@ -193,7 +202,7 @@ function init() {
     })
   );
   shadowMesh.rotation.x = -Math.PI / 2;
-  shadowMesh.position.y += 2* EPS;
+  shadowMesh.position.y += 2 * EPS;
   scene.add(shadowMesh);
 
   // Create 4 walls.
@@ -231,7 +240,7 @@ function init() {
 
   let loader = new OBJLoader();
   // console.log("before callback");
-  loader.load("glbs/1408 White Blood Cell.obj", function (object) {
+  loader.load(WHITECELLOBJ, function (object) {
     scene.remove(sphereMesh);
     sphereMesh = object.children[0].clone();
     sphereMesh.geometry.scale(objScale, objScale, objScale);
