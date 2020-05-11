@@ -220,6 +220,7 @@ function init() {
     sphereMesh.geometry.scale(objScale, objScale, objScale);
     sphereMesh.geometry.center();
     sphereMesh.position.set(0, sphereRestHeight + EPS, 0);
+    sphereMesh.material = new THREE.MeshLambertMaterial({ color: 0xccd4a1 })
     sphereMesh.castShadow = true;
     scene.add(sphereMesh);
   });
