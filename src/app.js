@@ -34,6 +34,8 @@ export var damageSound;
 export var shrekSound;
 export const sphereRestHeight = 0.5;
 export const bossRestHeight = 2.5;
+var shadowMesh;
+const zeroShadowHeight = 8;
 var boss;
 export let LEVEL = 1;
 const dt = 1 / 60;
@@ -166,20 +168,33 @@ function init() {
         new THREE.MeshLambertMaterial({
           side: THREE.DoubleSide,
           color: planeColor,
-          opacity: 0.5,
+          opacity: 0.8,
           map: organTexture,
-          transparent: true,
+          transparent: false,
           emissive: 0x321616,
         })
       );
       scene.add(planeMesh);
       planeMesh.position.set(x, y, z);
-      planeMesh.castShadow = true;
-      planeMesh.receiveShadow = true;
       planeMesh.rotation.x = Math.PI / 2;
       planeMeshes.push(planeMesh);
     }
   }
+
+  // Load the shadow texture.
+  let shadowLoader = new THREE.TextureLoader();
+  let shadowTexture = shadowLoader.load("../assets/roundshadow.png");
+  shadowMesh = new THREE.Mesh(
+    new THREE.PlaneBufferGeometry(sphereRad*10, sphereRad*10),
+    new THREE.MeshBasicMaterial({
+      map: shadowTexture,
+      transparent: true,
+      depthWrite: false,
+    })
+  );
+  shadowMesh.rotation.x = -Math.PI / 2;
+  shadowMesh.position.y += 2* EPS;
+  scene.add(shadowMesh);
 
   // Create 4 walls.
   createWall(height, new CANNON.Vec3(width, 1, height / 2 - planeRad));
@@ -222,8 +237,7 @@ function init() {
     sphereMesh.geometry.scale(objScale, objScale, objScale);
     sphereMesh.geometry.center();
     sphereMesh.position.set(0, sphereRestHeight + EPS, 0);
-    sphereMesh.material = new THREE.MeshLambertMaterial({ color: 0xccd4a1 })
-    sphereMesh.castShadow = true;
+    sphereMesh.material = new THREE.MeshLambertMaterial({ color: 0xccd4a1 });
     scene.add(sphereMesh);
   });
 
@@ -296,6 +310,14 @@ function animate() {
       handleWallCollisions();
       sphereMesh.position.copy(sphereBody.position);
       sphereMesh.quaternion.copy(sphereBody.quaternion);
+
+      // Update shadow of the sphere.
+      shadowMesh.position.x = sphereMesh.position.x;
+      shadowMesh.position.z = sphereMesh.position.z;
+      shadowMesh.material.opacity = Math.max(
+        0,
+        1 - (sphereMesh.position.y - sphereRad) / zeroShadowHeight
+      );
 
       // Check if sphere touches a viral tile
       updateCellsForParticle(sphereMesh);
@@ -428,6 +450,8 @@ function createWall(length, position, rotate) {
     wallGeometry,
     new THREE.MeshLambertMaterial({
       color: 0x75100e,
+      opacity: 0.5,
+      transparent: true,
     })
   );
   scene.add(wallMesh);
