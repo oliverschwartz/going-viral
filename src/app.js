@@ -35,19 +35,21 @@ export var shrekSound;
 export const sphereRestHeight = 0.5;
 export const bossRestHeight = 2.5;
 var boss;
+export let LEVEL = 1;
 const dt = 1 / 60;
 const camDistXZ = 5;
 const camHeightAbove = 3;
 const angle = (3 * Math.PI) / 180;
 var world;
 var controls, renderer, scene, camera;
-export var sphereBody; 
+export var sphereBody;
 var planeMeshes = [],
   sphereMesh,
   sphereRad,
   sphereDir,
   state,
   viruses = [],
+  bosses = [],
   menu,
   health,
   progress;
@@ -90,7 +92,7 @@ function init() {
   renderer = new THREE.WebGLRenderer({ antialias: true });
 
   // Add some sound.
-  addSounds();
+  // addSounds();
 
   // Set up camera
   camera.position.set(-camDistXZ, camHeightAbove, 0);
@@ -213,7 +215,7 @@ function init() {
   sphereMesh.position.set(0, sphereRestHeight + EPS, 0);
 
   let loader = new OBJLoader();
-  console.log("before callback");
+  // console.log("before callback");
   loader.load("glbs/1408 White Blood Cell.obj", function (object) {
     scene.remove(sphereMesh);
     sphereMesh = object.children[0].clone();
@@ -227,17 +229,17 @@ function init() {
 
   // Add event listeners for health damage.
   sphereBody.addEventListener("collide", function (e) {
-    if (
-      (e.body.mass == virusMass || e.body.mass == bossMass) &&
-      health != null
-    ) {
+    if (e.body.mass == virusMass && health != null) {
       health.takeDamage(30);
+    } else if (e.body.mass == virusMass && health != null) {
+      health.takeDamage(60);
     }
   });
 
   // Create a virus.
   for (let i = 0; i < 100; i++) {
     let virus = new Virus(
+      new THREE.Color(0x95db4f),
       new THREE.Vector3(
         10 + Math.floor(i * Math.random() * 5),
         sphereRestHeight,
@@ -249,14 +251,6 @@ function init() {
     viruses.push(virus);
     scene.add(virus.mesh);
   }
-
-  // Create a boss virus.
-  boss = new Boss(
-    new THREE.Vector3(width / 2, bossRestHeight, height / 2),
-    slipperyMaterial,
-    world
-  );
-  scene.add(boss.mesh);
 
   // Go to menu
   state = "menu";
@@ -318,9 +312,16 @@ function animate() {
         updateCellsForParticle(virus.mesh);
       }
 
-      boss.handleWallCollisions();
-      boss.mesh.position.copy(boss.body.position);
-      boss.mesh.quaternion.copy(boss.body.quaternion);
+      // Update grid cells and boss positions.
+      if (bosses.length) {
+        for (let i = 0; i < bosses.length; i++) {
+          let boss = bosses[i];
+          boss.handleWallCollisions();
+          boss.mesh.position.copy(boss.body.position);
+          boss.mesh.quaternion.copy(boss.body.quaternion);
+          updateCellsForParticle(boss.mesh);
+        }
+      }
 
       renderer.render(scene, camera);
       break;
@@ -368,6 +369,45 @@ function animate() {
         // More random walking !
         viruses[i].randomWalk();
       }
+
+      if (LEVEL == 2) {
+        // add more viruses
+        let slipperyMaterial = new CANNON.Material("slipperyMaterial");
+        for (let i = 0; i < 10; i++) {
+          // Create a boss virus.
+          boss = new Boss(
+            new THREE.Vector3(
+              10 + Math.floor(i * Math.random() * 5),
+              bossRestHeight,
+              10 + i * 100
+            ),
+            slipperyMaterial,
+            world
+          );
+          bosses.push(boss);
+          scene.add(boss.mesh);
+        }
+      }
+
+      if (LEVEL == 3) {
+        // add more viruses
+        let slipperyMaterial = new CANNON.Material("slipperyMaterial");
+        for (let i = 0; i < 50; i++) {
+          let virus = new Virus(
+            new THREE.Color("blue"),
+            new THREE.Vector3(
+              10 + Math.floor(i * Math.random() * 5),
+              sphereRestHeight,
+              10 + i * 10
+            ),
+            slipperyMaterial,
+            world
+          );
+          viruses.push(virus);
+          scene.add(virus.mesh);
+        }
+      }
+
       state = "menu";
     }
   }
@@ -513,9 +553,14 @@ function registerListeners() {
           // reset the game
           state = "reset";
         }
+        // enter game on menu with "enter"
         if (e.key === "Enter" && state == "menu") {
-          console.log("working");
           menu.startGame();
+        }
+        //
+        if (e.key === "l" && progress.state == "win") {
+          LEVEL++;
+          state = "reset";
         }
       },
       false

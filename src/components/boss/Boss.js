@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import * as CANNON from "cannon";
 import * as APP from "../../app.js";
-import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
+import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 
 const maxVelocity = 2.0;
 
@@ -22,20 +22,18 @@ class Boss {
 
     var self = this;
     let loader = new OBJLoader();
-    loader.load(
-      'glbs/1409 Virus.obj',
-      function (object) {
-        APP.scene.remove(self.mesh);
-        self.mesh = object.children[0].clone();
-        self.mesh.geometry.scale(0.2, 0.2, 0.2);
-        self.mesh.geometry.center();
-        self.mesh.position.set(position.x, position.y, position.z);
-        let color = new THREE.Color(0x8c0005);
-        color.g += (Math.random() - 1) * 0.25;
-        self.mesh.material.color = color;
-        self.mesh.castShadow = true;
-        APP.scene.add(self.mesh);
-      });
+    loader.load("glbs/1409 Virus.obj", function (object) {
+      APP.scene.remove(self.mesh);
+      self.mesh = object.children[0].clone();
+      self.mesh.geometry.scale(0.2, 0.2, 0.2);
+      self.mesh.geometry.center();
+      self.mesh.position.set(position.x, position.y, position.z);
+      let color = new THREE.Color("pink");
+      color.g += (Math.random() - 1) * 0.25;
+      self.mesh.material.color = color;
+      self.mesh.castShadow = true;
+      APP.scene.add(self.mesh);
+    });
 
     // Create the CANNON body.
     let shape = new CANNON.Sphere(this.radius);
@@ -97,9 +95,12 @@ class Boss {
     let dot = normal.dot(velocity.clone());
     let c = normal.clone().scale(3 * dot);
     let newVelocity = velocity.clone().vsub(c).scale(1);
-    newVelocity.x = maxVelocity > Math.abs(newVelocity.x) ? maxVelocity : newVelocity.x;
-    newVelocity.y = maxVelocity > Math.abs(newVelocity.y) ? maxVelocity : newVelocity.y;
-    newVelocity.z = maxVelocity > Math.abs(newVelocity.z) ? maxVelocity : newVelocity.z;
+    newVelocity.x =
+      maxVelocity > Math.abs(newVelocity.x) ? maxVelocity : newVelocity.x;
+    newVelocity.y =
+      maxVelocity > Math.abs(newVelocity.y) ? maxVelocity : newVelocity.y;
+    newVelocity.z =
+      maxVelocity > Math.abs(newVelocity.z) ? maxVelocity : newVelocity.z;
     return newVelocity;
   }
 
