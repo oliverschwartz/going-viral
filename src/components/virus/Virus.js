@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import * as CANNON from "cannon";
 import * as APP from "../../app.js";
-import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
+import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 
 const directions = {
   0: new CANNON.Vec3(1, 0, 0),
@@ -17,12 +17,11 @@ const directions = {
 const maxVelocity = 2.0;
 
 class Virus {
-  constructor(position, material, world) {
+  constructor(color, position, material, world) {
     this.name = "virus";
     this.radius = 0.5;
     const segments = 50;
     const impact = 20;
-    const color = new THREE.Color("green");
 
     // Create the THREE mesh.
     this.mesh = new THREE.Mesh(
@@ -33,20 +32,18 @@ class Virus {
 
     var self = this;
     let loader = new OBJLoader();
-    loader.load(
-      'glbs/1409 Virus.obj',
-      function (object) {
-        APP.scene.remove(self.mesh);
-        self.mesh = object.children[0].clone();
-        self.mesh.geometry.scale(0.05, 0.05, 0.05);
-        self.mesh.geometry.center();
-        self.mesh.position.set(position.x, position.y, position.z);
-        let color = new THREE.Color(0x95db4f);
-        color.g += (Math.random() - 1) * 0.25;
-        self.mesh.material.color = color;
-        self.mesh.castShadow = true;
-        APP.scene.add(self.mesh);
-      });
+    loader.load("glbs/1409 Virus.obj", function (object) {
+      APP.scene.remove(self.mesh);
+      self.mesh = object.children[0].clone();
+      self.mesh.geometry.scale(0.05, 0.05, 0.05);
+      self.mesh.geometry.center();
+      self.mesh.position.set(position.x, position.y, position.z);
+      // let color = new THREE.Color(0x95db4f);
+      color.g += (Math.random() - 1) * 0.25;
+      self.mesh.material.color = color;
+      self.mesh.castShadow = true;
+      APP.scene.add(self.mesh);
+    });
 
     // Create the CANNON body.
     let shape = new CANNON.Sphere(this.radius);
@@ -108,9 +105,12 @@ class Virus {
     let dot = normal.dot(velocity.clone());
     let c = normal.clone().scale(3 * dot);
     let newVelocity = velocity.clone().vsub(c).scale(1);
-    newVelocity.x = maxVelocity > Math.abs(newVelocity.x) ? maxVelocity : newVelocity.x;
-    newVelocity.y = maxVelocity > Math.abs(newVelocity.y) ? maxVelocity : newVelocity.y;
-    newVelocity.z = maxVelocity > Math.abs(newVelocity.z) ? maxVelocity : newVelocity.z;
+    newVelocity.x =
+      maxVelocity > Math.abs(newVelocity.x) ? maxVelocity : newVelocity.x;
+    newVelocity.y =
+      maxVelocity > Math.abs(newVelocity.y) ? maxVelocity : newVelocity.y;
+    newVelocity.z =
+      maxVelocity > Math.abs(newVelocity.z) ? maxVelocity : newVelocity.z;
     return newVelocity;
   }
 
