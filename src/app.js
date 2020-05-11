@@ -7,15 +7,14 @@ import { Virus } from "virus";
 import * as MENU from "menu";
 import { Health } from "health";
 import { Progress } from "progress";
+import ORGAN from "../assets/organ.jpg";
+import BACKGROUND from "../assets/organ.jpg";
 
 const loader = new THREE.TextureLoader();
-const bgTexture = loader.load("../assets/bg.jpg");
+const bgTexture = loader.load(BACKGROUND);
 import "bootstrap/dist/css/bootstrap.min.css";
 require("typeface-sigmar-one");
-const organTexture = new THREE.TextureLoader().load("../assets/organ.jpg");
-const lineTexture = new THREE.TextureLoader().load("../assets/texture.jpg");
-const cellTexture = new THREE.TextureLoader().load("../assets/cell.jpg");
-const cell2Texture = new THREE.TextureLoader().load("../assets/cell2.jpg");
+const organTexture = new THREE.TextureLoader().load(ORGAN);
 
 /***************************************************************************/
 /* CONSTANTS AND VARIABLES */
@@ -530,15 +529,16 @@ function registerListeners() {
 function addSounds() {
   let audioListener = new THREE.AudioListener();
   camera.add(audioListener);
-  
+
   damageSound = new THREE.Audio(audioListener);
-  let soundLoader = new THREE.AudioLoader();
-  soundLoader.load("audio/damage.mp3", function (audioBuffer) {
+  let soundLoader1 = new THREE.AudioLoader();
+  soundLoader1.load("audio/damage.mp3", function (audioBuffer) {
     damageSound.setBuffer(audioBuffer);
   });
-  
+
+  let soundLoader2 = new THREE.AudioLoader();
   shrekSound = new THREE.Audio(audioListener);
-  soundLoader.load("audio/shreksophone.mp3", function (audioBuffer) {
+  soundLoader2.load("audio/shreksophone.mp3", function (audioBuffer) {
     shrekSound.setBuffer(audioBuffer);
     shrekSound.setLoop(true);
     shrekSound.setVolume(0.5);
