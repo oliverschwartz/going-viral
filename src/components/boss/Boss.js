@@ -4,15 +4,28 @@ import * as APP from "../../app.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import VIRUSOBJ from "../../../glbs/1409 Virus.glb";
 
-const maxVelocity = 2.0;
-
 class Boss {
-  constructor(position, material, world) {
-    this.name = "virus";
-    this.radius = 2;
+  constructor(
+    radius,
+    color,
+    velocity,
+    impact,
+    mass,
+    position,
+    material,
+    world
+  ) {
+    this.name = "boss";
+    this.radius = radius;
+    this.maxVelocity = velocity;
     const segments = 50;
-    this.impact = 200;
-    const color = new THREE.Color("pink");
+    const scale = this.radius * 0.1;
+    this.impact = impact;
+    this.mass = mass;
+    // this.radius = 2;
+    // const segments = 50;
+    // this.impact = 200;
+    // const color = new THREE.Color("pink");
 
     // Create the THREE mesh.
     this.mesh = new THREE.Mesh(
@@ -26,10 +39,9 @@ class Boss {
     loader.load(VIRUSOBJ, function (object) {
       APP.scene.remove(self.mesh);
       self.mesh = object.scene.children[0].children[0].clone();
-      self.mesh.geometry.scale(0.2, 0.2, 0.2);
+      self.mesh.geometry.scale(scale, scale, scale);
       self.mesh.geometry.center();
       self.mesh.position.set(position.x, position.y, position.z);
-      color.g += (Math.random() - 1) * 0.25;
       self.mesh.material = new THREE.MeshPhongMaterial({
         color: color,
       });
@@ -40,7 +52,7 @@ class Boss {
     // Create the CANNON body.
     let shape = new CANNON.Sphere(this.radius);
     this.body = new CANNON.Body({
-      mass: APP.bossMass,
+      mass: this.mass,
       linearDamping: 0.5,
       angularDamping: 0,
       material: material,
@@ -98,11 +110,17 @@ class Boss {
     let c = normal.clone().scale(3 * dot);
     let newVelocity = velocity.clone().vsub(c).scale(1);
     newVelocity.x =
-      maxVelocity > Math.abs(newVelocity.x) ? maxVelocity : newVelocity.x;
+      this.maxVelocity > Math.abs(newVelocity.x)
+        ? this.maxVelocity
+        : newVelocity.x;
     newVelocity.y =
-      maxVelocity > Math.abs(newVelocity.y) ? maxVelocity : newVelocity.y;
+      this.maxVelocity > Math.abs(newVelocity.y)
+        ? this.maxVelocity
+        : newVelocity.y;
     newVelocity.z =
-      maxVelocity > Math.abs(newVelocity.z) ? maxVelocity : newVelocity.z;
+      this.maxVelocity > Math.abs(newVelocity.z)
+        ? this.maxVelocity
+        : newVelocity.z;
     return newVelocity;
   }
 

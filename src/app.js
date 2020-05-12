@@ -71,16 +71,23 @@ const virusProperties = {
   LEVEL1: {
     radius: 0.5,
     color: new THREE.Color(0x95db4f),
-    velocity: 2.0,
-    impact: 10,
+    velocity: 1.0,
+    impact: 6,
     mass: 1,
+  },
+  LEVEL2: {
+    radius: 2.0,
+    color: new THREE.Color("hotpink"),
+    velocity: 2.0,
+    impact: 200,
+    mass: 20,
   },
   LEVEL3: {
     radius: 1.0,
     color: new THREE.Color(0x00bfff),
-    velocity: 4.0,
+    velocity: 8.0,
     impact: 50,
-    mass: 5,
+    mass: 3,
   },
   LEVEL4: {
     radius: 0.3,
@@ -278,19 +285,19 @@ function init() {
   // Add event listeners for health damage.
   sphereBody.addEventListener("collide", function (e) {
     if (e.body.mass == virusProperties["LEVEL1"].mass && health != null) {
-      health.takeDamage(25);
+      health.takeDamage(15);
     } else if (e.body.mass == bossMass && health != null) {
-      health.takeDamage(60);
+      health.takeDamage(45);
     } else if (
       e.body.mass == virusProperties["LEVEL3"].mass &&
       health != null
     ) {
-      health.takeDamage(45);
+      health.takeDamage(30);
     } else if (
       e.body.mass == virusProperties["LEVEL4"].mass &&
       health != null
     ) {
-      health.takeDamage(30);
+      health.takeDamage(25);
     }
   });
 
@@ -304,7 +311,7 @@ function init() {
       virusProperties["LEVEL1"].impact,
       virusProperties["LEVEL1"].mass,
       new THREE.Vector3(
-        10 + Math.floor(i * Math.random() * 5),
+        1 + Math.floor(Math.random() * width - 1),
         virusProperties["LEVEL1"].radius,
         10 + i * 10
       ),
@@ -384,6 +391,9 @@ function animate() {
     }
 
     case "reset": {
+      if (progress.state == "gameover") {
+        LEVEL = 1;
+      }
       // Clear current display screen
       menu.clearWin();
       menu.clearGameover();
@@ -403,7 +413,7 @@ function animate() {
       // Reset each virus
       for (let i = 0; i < viruses.length; i++) {
         var newVirusPos = new THREE.Vector3(
-          10 + Math.floor(i * Math.random() * 5),
+          1 + Math.floor(Math.random() * width - 1),
           sphereRestHeight,
           10 + i * 10
         );
@@ -431,21 +441,18 @@ function animate() {
       cleanViruses(indigoViruses);
 
       if (LEVEL == 2) {
-        addBosses();
+        addBosses("LEVEL2", 10, bosses);
       }
 
       if (LEVEL == 3) {
-        addBosses();
+        addBosses("LEVEL2", 10, bosses);
         addViruses("LEVEL3", 30, blueViruses);
       }
 
       if (LEVEL == 4) {
-        addBosses();
+        addBosses("LEVEL2", 10, bosses);
         addViruses("LEVEL3", 50, blueViruses);
-        addViruses("LEVEL4", 40, indigoViruses);
-      }
-      if (progress.state == "gameover") {
-        LEVEL = 1;
+        addBosses("LEVEL4", 40, indigoViruses);
       }
 
       state = "menu";
@@ -665,21 +672,38 @@ function cleanViruses(viruses) {
   }
 }
 
-function addBosses() {
+function addBosses(level, number, list) {
   // add bosses
   let slipperyMaterial = new CANNON.Material("slipperyMaterial");
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < number; i++) {
     // Create a boss virus.
+
+    // (
+    //   radius,
+    //   color,
+    //   velocity,
+    //   impact,
+    //   mass,
+    //   position,
+    //   material,
+    //   world
+    // )
+
     boss = new Boss(
+      virusProperties[level].radius,
+      virusProperties[level].color,
+      virusProperties[level].velocity,
+      virusProperties[level].impact,
+      virusProperties[level].mass,
       new THREE.Vector3(
-        10 + Math.floor(i * Math.random() * 7),
-        bossRestHeight,
-        10 + i * 100
+        1 + Math.floor(Math.random() * width - 1),
+        virusProperties[level].radius,
+        10 + i * Math.floor(height / number)
       ),
       slipperyMaterial,
       world
     );
-    bosses.push(boss);
+    list.push(boss);
     scene.add(boss.mesh);
   }
 }
@@ -695,7 +719,7 @@ function addViruses(level, number, list) {
       virusProperties[level].impact,
       virusProperties[level].mass,
       new THREE.Vector3(
-        10 + Math.floor(i * Math.random() * 8),
+        1 + Math.floor(Math.random() * width - 1),
         virusProperties[level].radius,
         10 + i * Math.floor(height / number)
       ),
