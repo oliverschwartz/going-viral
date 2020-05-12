@@ -1,7 +1,6 @@
 import * as THREE from "three";
 import * as CANNON from "cannon";
 import * as APP from "../../app.js";
-// import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import VIRUSOBJ from "../../../glbs/1409 Virus2.glb";
 

@@ -2,7 +2,6 @@ import * as THREE from "three";
 import * as CANNON from "cannon";
 import { BasicLights } from "lights";
 import { updateCellsForParticle, resetRender } from "./updateRender.js";
-// import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { Virus } from "virus";
 import { Boss } from "boss";
@@ -14,10 +13,6 @@ import BACKGROUND from "../assets/bg.jpg";
 import ROUNDSHADOW from "../assets/roundshadow.png";
 
 import WHITECELLOBJ from "../glbs/1408 White Blood Cell.glb";
-// import VIRUSOBJ from "../glbs/1409 Virus.glb";
-// import VIRUSOBJ from "../glbs/1409 Virus.obj";
-// import WHITECELLOBJ from "../glbs/1408 White Blood Cell.obj";
-// export const VIRUS = VIRUSOBJ;
 
 import menuCSS from "./css/menu.css";
 import healthCSS from "./css/health.css";
