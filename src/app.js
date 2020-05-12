@@ -71,12 +71,7 @@ var planeMeshes = [],
   menu,
   progress;
 var keys = [0, 0, 0, 0, 0]; // Up, Down, Left, Right, Jump!
-var date,
-  pn,
-  longWall1,
-  longWall2,
-  shortWall1,
-  shortWall2;
+var date, pn, longWall1, longWall2, shortWall1, shortWall2;
 
 const virusProperties = {
   LEVEL1: {
@@ -148,8 +143,8 @@ function init() {
   // Add some sound.
   addSounds();
 
-  // Add some upgrades. 
-  let upgrade = new Upgrade(new THREE.Vector3(5,0.8,5), "spray");
+  // Add some upgrades.
+  let upgrade = new Upgrade(new THREE.Vector3(5, 0.8, 5), "spray");
   upgrades.push(upgrade);
 
   // Set up camera
@@ -227,7 +222,8 @@ function init() {
           opacity: 0.2,
           map: organTexture,
           transparent: false,
-          emissive: 0x4D2D26,
+          // emissive: 0x4d2d26,
+          emissive: 0x4d0707,
         })
       );
       scene.add(planeMesh);
@@ -238,14 +234,28 @@ function init() {
   }
 
   // initalize perlin variables
-	date = new Date();
-  pn = new Perlin('rnd' + date.getTime());
+  date = new Date();
+  pn = new Perlin("rnd" + date.getTime());
 
-  // Create 4 walls and add them to the scene 
-  longWall1 = createWall(height, new CANNON.Vec3(width, 1, height / 2 - planeRad));
-  longWall2 = createWall(height, new CANNON.Vec3(0 - planeRad * 2, 1, height / 2 - planeRad));
-  shortWall1 = createWall(width, new CANNON.Vec3(width / 2 - planeRad, 1, height), true);
-  shortWall2 = createWall(width, new CANNON.Vec3(width / 2 - planeRad, 1, -planeRad * 2), true);
+  // Create 4 walls and add them to the scene
+  longWall1 = createWall(
+    height,
+    new CANNON.Vec3(width, 1, height / 2 - planeRad)
+  );
+  longWall2 = createWall(
+    height,
+    new CANNON.Vec3(0 - planeRad * 2, 1, height / 2 - planeRad)
+  );
+  shortWall1 = createWall(
+    width,
+    new CANNON.Vec3(width / 2 - planeRad, 1, height),
+    true
+  );
+  shortWall2 = createWall(
+    width,
+    new CANNON.Vec3(width / 2 - planeRad, 1, -planeRad * 2),
+    true
+  );
 
   // Load the shadow texture.
   let shadowLoader = new THREE.TextureLoader();
@@ -290,7 +300,7 @@ function init() {
     sphereMesh.geometry.scale(objScale, objScale, objScale);
     sphereMesh.geometry.center();
     sphereMesh.position.set(0, sphereRestHeight + EPS, 0);
-    sphereMesh.material = new THREE.MeshLambertMaterial({ color: 0xccd4a1 });
+    sphereMesh.material = new THREE.MeshLambertMaterial({ color: 0xd6d6d6 });
     scene.add(sphereMesh);
   });
 
@@ -313,26 +323,8 @@ function init() {
     }
   });
 
-  // Create a virus.
-  for (let i = 0; i < 100; i++) {
-    // virus (radius, color, velocity, impact, position, material, world) {
-    let virus = new Virus(
-      virusProperties["LEVEL1"].radius,
-      virusProperties["LEVEL1"].color,
-      virusProperties["LEVEL1"].velocity,
-      virusProperties["LEVEL1"].impact,
-      virusProperties["LEVEL1"].mass,
-      new THREE.Vector3(
-        1 + Math.floor(Math.random() * width - 1),
-        virusProperties["LEVEL1"].radius,
-        10 + i * 10
-      ),
-      slipperyMaterial,
-      world
-    );
-    viruses.push(virus);
-    scene.add(virus.mesh);
-  }
+  addViruses("LEVEL1", 80, viruses);
+
   // Go to menu
   state = "menu";
 }
@@ -398,7 +390,7 @@ function animate() {
       updateViruses(blueViruses);
       updateViruses(indigoViruses);
 
-      // Update the upgrades. 
+      // Update the upgrades.
       for (let i = 0; i < upgrades.length; i++) {
         let upgrade = upgrades[i];
         upgrade.handleCollisions(sphereMesh.position.clone());
@@ -416,7 +408,7 @@ function animate() {
       menu.clearWin();
       menu.clearGameover();
 
-      // Reset all the upgrades. 
+      // Reset all the upgrades.
       for (let i = 0; i < upgrades.length; i++) {
         upgrades[i].reset();
       }
@@ -437,8 +429,8 @@ function animate() {
       for (let i = 0; i < viruses.length; i++) {
         var newVirusPos = new THREE.Vector3(
           1 + Math.floor(Math.random() * width - 1),
-          sphereRestHeight,
-          10 + i * 10
+          virusProperties["LEVEL1"].radius,
+          1 + Math.floor((i * height) / viruses.length)
         );
         // Reset physics
         viruses[i].body.position.set(
@@ -494,12 +486,12 @@ function animate() {
 */
 function createWall(length, position, rotate) {
   let wallGeometry = new THREE.PlaneGeometry(planeRad * 2, length, 40, 700);
-  
+
   // Apply Perlin noise
   for (var i = 0, l = wallGeometry.vertices.length; i < l; i++) {
     var vertex = wallGeometry.vertices[i];
-    var value = pn.noise(vertex.x , vertex.y , 0);
-    vertex.z = value ;
+    var value = pn.noise(vertex.x, vertex.y, 0);
+    vertex.z = value;
   }
 
   //ensure light is computed correctly
@@ -509,9 +501,9 @@ function createWall(length, position, rotate) {
   let wallMesh = new THREE.Mesh(
     wallGeometry,
     new THREE.MeshLambertMaterial({
-      color: 0x8B0000,
-      side: THREE.DoubleSide, 
-      reflectivity: 0.1
+      color: 0x8b0000,
+      side: THREE.DoubleSide,
+      reflectivity: 0.1,
       // color: 0x75100e,
       // opacity: 0.5,
       // transparent: true,
@@ -521,16 +513,21 @@ function createWall(length, position, rotate) {
   scene.add(wallMesh);
   wallMesh.position.set(position.x, position.y, position.z);
   wallMesh.rotation.x = -Math.PI / 2;
-  if (rotate) { // short walls
+  if (rotate) {
+    // short walls
     wallMesh.rotation.z = Math.PI / 2;
     wallMesh.rotation.x += Math.PI / 2;
-    if (position.z < height/2) wallMesh.position.set(position.x, position.y, position.z+0.6); // start
-    else wallMesh.position.set(position.x, position.y, position.z-1.3); // finish 
-  }
-  else { // long walls
+    if (position.z < height / 2)
+      wallMesh.position.set(position.x, position.y, position.z + 0.6);
+    // start
+    else wallMesh.position.set(position.x, position.y, position.z - 1.3); // finish
+  } else {
+    // long walls
     wallMesh.rotation.y += Math.PI / 2;
-    if (position.x < width) wallMesh.position.set(position.x+.7, position.y, position.z); // left
-    else wallMesh.position.set(position.x-1.5, position.y, position.z); // right
+    if (position.x < width)
+      wallMesh.position.set(position.x + 0.7, position.y, position.z);
+    // left
+    else wallMesh.position.set(position.x - 1.5, position.y, position.z); // right
   }
 
   return wallMesh;
@@ -710,7 +707,7 @@ function addSounds() {
   let soundLoader3 = new THREE.AudioLoader();
   healSound = new THREE.Audio(audioListener);
   soundLoader3.load("audio/heal.mp3", function (audioBuffer) {
-    healSound.setBuffer(audioBuffer); 
+    healSound.setBuffer(audioBuffer);
   });
 }
 
@@ -732,19 +729,6 @@ function addBosses(level, number, list) {
   // add bosses
   let slipperyMaterial = new CANNON.Material("slipperyMaterial");
   for (let i = 0; i < number; i++) {
-    // Create a boss virus.
-
-    // (
-    //   radius,
-    //   color,
-    //   velocity,
-    //   impact,
-    //   mass,
-    //   position,
-    //   material,
-    //   world
-    // )
-
     boss = new Boss(
       virusProperties[level].radius,
       virusProperties[level].color,
@@ -754,7 +738,7 @@ function addBosses(level, number, list) {
       new THREE.Vector3(
         1 + Math.floor(Math.random() * width - 1),
         virusProperties[level].radius,
-        10 + i * Math.floor(height / number)
+        1 + Math.floor((i * height) / number)
       ),
       slipperyMaterial,
       world
@@ -777,7 +761,7 @@ function addViruses(level, number, list) {
       new THREE.Vector3(
         1 + Math.floor(Math.random() * width - 1),
         virusProperties[level].radius,
-        10 + i * Math.floor(height / number)
+        1 + Math.floor((i * height) / number)
       ),
       slipperyMaterial,
       world
