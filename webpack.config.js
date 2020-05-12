@@ -15,8 +15,9 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.obj$/i,
+        test: /\.obj$/,
         loader: "webpack-obj-loader",
+        exclude: path.resolve(__dirname, "./node_modules/"),
       },
       {
         test: /\.css$/i,
@@ -40,7 +41,7 @@ module.exports = {
         exclude: path.resolve(__dirname, "./node_modules/"),
       },
       {
-        test: /\.(jpe?g|png|gif|svg|tga|gltf|babylon|mtl|pcb|pcd|prwm|obj|mat|mp3|ogg)$/i,
+        test: /\.(jpe?g|png|gif|svg|tga|gltf|glb|babylon|mtl|pcb|pcd|prwm|obj|mat|mp3|ogg)$/i,
         use: "file-loader",
         exclude: path.resolve(__dirname, "./node_modules/"),
       },

@@ -2,7 +2,8 @@ import * as THREE from "three";
 import * as CANNON from "cannon";
 import { BasicLights } from "lights";
 import { updateCellsForParticle, resetRender } from "./updateRender.js";
-import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
+// import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { Virus } from "virus";
 import { Boss } from "boss";
 import * as MENU from "menu";
@@ -12,7 +13,11 @@ import ORGAN from "../assets/organ.jpg";
 import BACKGROUND from "../assets/bg.jpg";
 import ROUNDSHADOW from "../assets/roundshadow.png";
 
-import WHITECELLOBJ from "../glbs/1408 White Blood Cell.obj";
+import WHITECELLOBJ from "../glbs/1408 White Blood Cell.glb";
+// import VIRUSOBJ from "../glbs/1409 Virus.glb";
+// import VIRUSOBJ from "../glbs/1409 Virus.obj";
+// import WHITECELLOBJ from "../glbs/1408 White Blood Cell.obj";
+// export const VIRUS = VIRUSOBJ;
 
 import menuCSS from "./css/menu.css";
 import healthCSS from "./css/health.css";
@@ -232,17 +237,18 @@ function init() {
   world.add(sphereBody);
   sphereMesh = new THREE.Mesh(
     new THREE.SphereGeometry(sphereRad, 100, 100),
-    new THREE.MeshPhongMaterial({ color: 0xffffff })
+    new THREE.MeshPhongMaterial({ color: 0x000000 })
   );
   scene.add(sphereMesh);
   sphereBody.position.set(0, sphereRestHeight + EPS, 0);
   sphereMesh.position.set(0, sphereRestHeight + EPS, 0);
 
-  let loader = new OBJLoader();
+  // let loader = new OBJLoader();
+  let loader = new GLTFLoader();
   // console.log("before callback");
   loader.load(WHITECELLOBJ, function (object) {
     scene.remove(sphereMesh);
-    sphereMesh = object.children[0].clone();
+    sphereMesh = object.scene.children[0].children[0].clone();
     sphereMesh.geometry.scale(objScale, objScale, objScale);
     sphereMesh.geometry.center();
     sphereMesh.position.set(0, sphereRestHeight + EPS, 0);
@@ -262,7 +268,7 @@ function init() {
   // Create a virus.
   for (let i = 0; i < 100; i++) {
     let virus = new Virus(
-      new THREE.Color(0x95db4f),
+      // new THREE.Color(0x95db4f),
       new THREE.Vector3(
         10 + Math.floor(i * Math.random() * 5),
         sphereRestHeight,

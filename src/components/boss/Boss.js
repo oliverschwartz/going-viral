@@ -1,8 +1,9 @@
 import * as THREE from "three";
 import * as CANNON from "cannon";
 import * as APP from "../../app.js";
-import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
-import VIRUSOBJ from "../../../glbs/1409 Virus.obj";
+// import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import VIRUSOBJ from "../../../glbs/1409 Virus.glb";
 
 const maxVelocity = 2.0;
 
@@ -12,7 +13,7 @@ class Boss {
     this.radius = 2;
     const segments = 50;
     this.impact = 200;
-    const color = new THREE.Color("red");
+    // const color = new THREE.Color("red");
 
     // Create the THREE mesh.
     this.mesh = new THREE.Mesh(
@@ -22,16 +23,19 @@ class Boss {
     this.mesh.position.set(position.x, position.y, position.z);
 
     var self = this;
-    let loader = new OBJLoader();
+    let loader = new GLTFLoader();
     loader.load(VIRUSOBJ, function (object) {
       APP.scene.remove(self.mesh);
-      self.mesh = object.children[0].clone();
+      self.mesh = object.scene.children[0].children[0].clone();
       self.mesh.geometry.scale(0.2, 0.2, 0.2);
       self.mesh.geometry.center();
       self.mesh.position.set(position.x, position.y, position.z);
-      let color = new THREE.Color("pink");
+      self.mesh.material = new THREE.MeshPhongMaterial({
+        color: new THREE.Color("pink"),
+      });
+
       color.g += (Math.random() - 1) * 0.25;
-      self.mesh.material.color = color;
+      // self.mesh.material.color = color;
       self.mesh.castShadow = true;
       APP.scene.add(self.mesh);
     });
