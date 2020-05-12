@@ -33,8 +33,9 @@ const organTexture = new THREE.TextureLoader().load(ORGAN);
 /* CONSTANTS AND VARIABLES */
 
 export const EPS = 0.05;
-const impact = 10 ** -3;
+const impact = 10;
 const objScale = 0.05;
+const NUM_UPGRADES = 10; 
 export const width = 20;
 export const height = 1000;
 export const planeRad = 1;
@@ -144,8 +145,16 @@ function init() {
   addSounds();
 
   // Add some upgrades.
-  let upgrade = new Upgrade(new THREE.Vector3(5, 0.8, 5), "spray");
-  upgrades.push(upgrade);
+  const types = ["toilet_roll", "spray"]
+  const interval = height / NUM_UPGRADES; 
+  const buffer = 5; 
+  for (let i = 0; i < NUM_UPGRADES; i++) {
+    let x_pos = Math.random() * width; 
+    let z_pos = interval * i + buffer;
+    let type = types[Math.floor(Math.random() * types.length)];
+    let upgrade = new Upgrade(new THREE.Vector3(x_pos, 0.8, z_pos), type);
+    upgrades.push(upgrade);
+  }
 
   // Set up camera
   camera.position.set(-camDistXZ, camHeightAbove, 0);
@@ -278,8 +287,8 @@ function init() {
   let sphereShape = new CANNON.Sphere(sphereRad);
   sphereBody = new CANNON.Body({
     mass: 1,
-    linearDamping: 0.5,
-    angularDamping: 0.5,
+    linearDamping: 0.7,
+    angularDamping: 0.7,
     material: groundMaterial,
   });
   sphereBody.addShape(sphereShape);
@@ -393,7 +402,10 @@ function animate() {
       // Update the upgrades.
       for (let i = 0; i < upgrades.length; i++) {
         let upgrade = upgrades[i];
-        upgrade.handleCollisions(sphereMesh.position.clone());
+        if (upgrade.mesh !== undefined) {
+          upgrade.mesh.rotation.y += 0.02; 
+          upgrade.handleCollisions(sphereMesh.position.clone());
+        }
       }
 
       renderer.render(scene, camera);
