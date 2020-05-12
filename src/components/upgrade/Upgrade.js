@@ -45,6 +45,7 @@ class Upgrade {
     if (dist < EPS && APP.health.curHealth < APP.health.maxHealth) {
       this.mesh.visible = false;
       APP.health.addHealth(100);
+      APP.healSound.play();
       this.consumed = true;
     }
   }

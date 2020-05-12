@@ -44,6 +44,7 @@ export const planeColor = new THREE.Color(0x75100e);
 export var scene;
 export var damageSound;
 export var shrekSound;
+export var healSound;
 export const sphereRestHeight = 0.5;
 export const bossRestHeight = 2.5;
 export var health;
@@ -113,7 +114,7 @@ function init() {
   renderer = new THREE.WebGLRenderer({ antialias: true });
 
   // Add some sound.
-  // addSounds();
+  addSounds();
 
   // Add some upgrades. 
   let upgrade = new Upgrade(new THREE.Vector3(5,0.8,5), "spray");
@@ -691,6 +692,13 @@ function addSounds() {
     shrekSound.setLoop(true);
     shrekSound.setVolume(0.5);
     shrekSound.play();
+  });
+
+  let soundLoader3 = new THREE.AudioLoader();
+  healSound = new THREE.Audio(audioListener);
+  soundLoader3.load("audio/heal.mp3", function (audioBuffer) {
+    healSound.setBuffer(audioBuffer); 
+    healSound.play();
   });
 }
 
