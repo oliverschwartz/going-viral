@@ -698,7 +698,6 @@ function addSounds() {
   healSound = new THREE.Audio(audioListener);
   soundLoader3.load("audio/heal.mp3", function (audioBuffer) {
     healSound.setBuffer(audioBuffer); 
-    healSound.play();
   });
 }
 
