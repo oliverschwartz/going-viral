@@ -2,30 +2,18 @@ import * as THREE from "three";
 import * as CANNON from "cannon";
 import * as APP from "../../app.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import VIRUSOBJ from "../../../glbs/1409 Virus2.glb";
-
-
-const directions = {
-  0: new CANNON.Vec3(1, 0, 0),
-  1: new CANNON.Vec3(-1, 0, 0),
-  2: new CANNON.Vec3(0, 0, 1),
-  3: new CANNON.Vec3(0, 0, -1),
-  4: new CANNON.Vec3(1, 0, 1),
-  5: new CANNON.Vec3(-1, 0, 1),
-  6: new CANNON.Vec3(1, 0, -1),
-  7: new CANNON.Vec3(-1, 0, -1),
-};
+import VIRUSOBJ from "../../../glbs/1409 Virus.glb";
 
 const maxVelocity = 2.0;
 
-class Virus {
+class Boss {
   constructor(position, material, world) {
     this.name = "virus";
-    this.radius = 0.5;
+    this.radius = 2;
     const segments = 50;
-    const impact = 20;
+    this.impact = 200;
+    // const color = new THREE.Color("red");
 
-    let color = new THREE.Color(0x95db4f);
     // Create the THREE mesh.
     this.mesh = new THREE.Mesh(
       new THREE.SphereGeometry(this.radius, segments),
@@ -34,16 +22,19 @@ class Virus {
     this.mesh.position.set(position.x, position.y, position.z);
 
     var self = this;
-    // let loader = new OBJLoader();
     let loader = new GLTFLoader();
     loader.load(VIRUSOBJ, function (object) {
       APP.scene.remove(self.mesh);
       self.mesh = object.scene.children[0].children[0].clone();
-      self.mesh.geometry.scale(0.05, 0.05, 0.05);
+      self.mesh.geometry.scale(0.2, 0.2, 0.2);
       self.mesh.geometry.center();
       self.mesh.position.set(position.x, position.y, position.z);
+      self.mesh.material = new THREE.MeshPhongMaterial({
+        color: new THREE.Color("pink"),
+      });
+
       color.g += (Math.random() - 1) * 0.25;
-      self.mesh.material = new THREE.MeshPhongMaterial({ color: color });
+      self.mesh.material.color = color;
       self.mesh.castShadow = true;
       APP.scene.add(self.mesh);
     });
@@ -51,7 +42,7 @@ class Virus {
     // Create the CANNON body.
     let shape = new CANNON.Sphere(this.radius);
     this.body = new CANNON.Body({
-      mass: APP.virusMass,
+      mass: APP.bossMass,
       linearDamping: 0.5,
       angularDamping: 0,
       material: material,
@@ -77,8 +68,8 @@ class Virus {
     }
 
     // -x wall
-    if (this.body.position.x < APP.EPS) {
-      this.body.position.x = APP.EPS;
+    if (this.body.position.x - this.radius < APP.EPS) {
+      this.body.position.x = APP.EPS + this.radius;
       this.body.velocity = this.calculateVelocity(
         new CANNON.Vec3(-1, 0, 0),
         velocity
@@ -94,8 +85,8 @@ class Virus {
       );
     }
     // -z wall
-    if (this.body.position.z < APP.EPS) {
-      this.body.position.z = APP.EPS;
+    if (this.body.position.z - this.radius < APP.EPS) {
+      this.body.position.z = APP.EPS + this.radius;
       this.body.velocity = this.calculateVelocity(
         new CANNON.Vec3(0, 0, -1),
         velocity
@@ -120,10 +111,11 @@ class Virus {
   randomWalk() {
     var state = APP.getState();
     if (state == "play") {
-      let index = Math.floor(8 * Math.random());
-      directions[index].normalize();
-      directions[index] = directions[index].scale(10);
-      this.body.applyImpulse(directions[index], this.body.position);
+      let direction = APP.sphereBody.position.clone();
+      direction = direction.vsub(this.body.position);
+      direction.normalize();
+      direction = direction.scale(this.impact);
+      this.body.applyImpulse(direction, this.body.position);
     }
     let me = this;
     setTimeout(function () {
@@ -132,4 +124,4 @@ class Virus {
   }
 }
 
-export default Virus;
+export default Boss;

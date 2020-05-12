@@ -2,8 +2,9 @@ import * as THREE from "three";
 import * as CANNON from "cannon";
 import { BasicLights } from "lights";
 import { updateCellsForParticle, resetRender } from "./updateRender.js";
-import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { Virus } from "virus";
+import { Boss } from "boss";
 import * as MENU from "menu";
 import { Health } from "health";
 import { Progress } from "progress";
@@ -11,6 +12,15 @@ import { Perlin } from "perlin";
 
 import ORGAN from "../assets/organ.jpg";
 import BACKGROUND from "../assets/bg.jpg";
+import ROUNDSHADOW from "../assets/roundshadow.png";
+
+import WHITECELLOBJ from "../glbs/1408 White Blood Cell.glb";
+
+import menuCSS from "./css/menu.css";
+import healthCSS from "./css/health.css";
+import progressCSS from "./css/progress.css";
+import winCSS from "./css/win.css";
+import gameoverCSS from "./css/gameover.css";
 
 const loader = new THREE.TextureLoader();
 const bgTexture = loader.load(BACKGROUND);
@@ -28,24 +38,31 @@ export const width = 20;
 export const height = 1000;
 export const planeRad = 1;
 export const virusMass = 1;
+export const bossMass = 20;
 export const planeColor = new THREE.Color(0x75100e);
 export var scene;
 export var damageSound;
 export var shrekSound;
 export const sphereRestHeight = 0.5;
+export const bossRestHeight = 2.5;
+var shadowMesh;
+const zeroShadowHeight = 8;
+var boss;
+export let LEVEL = 1;
 const dt = 1 / 60;
 const camDistXZ = 5;
 const camHeightAbove = 3;
 const angle = (3 * Math.PI) / 180;
 var world;
 var controls, renderer, scene, camera;
+export var sphereBody;
 var planeMeshes = [],
   sphereMesh,
-  sphereBody,
   sphereRad,
   sphereDir,
   state,
   viruses = [],
+  bosses = [],
   menu,
   health,
   progress;
@@ -94,7 +111,7 @@ function init() {
   renderer = new THREE.WebGLRenderer({ antialias: true });
 
   // Add some sound.
-  addSounds();
+  // addSounds();
 
   // Set up camera
   camera.position.set(-camDistXZ, camHeightAbove, 0);
@@ -168,16 +185,14 @@ function init() {
         new THREE.MeshLambertMaterial({
           side: THREE.DoubleSide,
           color: planeColor,
-          opacity: 0.5,
+          opacity: 0.2,
           map: organTexture,
-          transparent: true,
-          emissive: 0x321616,
+          transparent: false,
+          emissive: 0x4D2D26,
         })
       );
       scene.add(planeMesh);
       planeMesh.position.set(x, y, z);
-      planeMesh.castShadow = true;
-      planeMesh.receiveShadow = true;
       planeMesh.rotation.x = Math.PI / 2;
       planeMeshes.push(planeMesh);
     }
@@ -188,12 +203,25 @@ function init() {
   pn = new Perlin('rnd' + date.getTime());
 
   // Create 4 walls and add them to the scene 
-  // first two instantiated easily
   longWall1 = createWall(height, new CANNON.Vec3(width, 1, height / 2 - planeRad));
   longWall2 = createWall(height, new CANNON.Vec3(0 - planeRad * 2, 1, height / 2 - planeRad));
   shortWall1 = createWall(width, new CANNON.Vec3(width / 2 - planeRad, 1, height), true);
   shortWall2 = createWall(width, new CANNON.Vec3(width / 2 - planeRad, 1, -planeRad * 2), true);
 
+  // Load the shadow texture.
+  let shadowLoader = new THREE.TextureLoader();
+  let shadowTexture = shadowLoader.load(ROUNDSHADOW);
+  shadowMesh = new THREE.Mesh(
+    new THREE.PlaneBufferGeometry(sphereRad * 10, sphereRad * 10),
+    new THREE.MeshBasicMaterial({
+      map: shadowTexture,
+      transparent: true,
+      depthWrite: false,
+    })
+  );
+  shadowMesh.rotation.x = -Math.PI / 2;
+  shadowMesh.position.y += 2 * EPS;
+  scene.add(shadowMesh);
 
   // Create a sphere.
   sphereRad = 0.5;
@@ -209,21 +237,22 @@ function init() {
   world.add(sphereBody);
   sphereMesh = new THREE.Mesh(
     new THREE.SphereGeometry(sphereRad, 100, 100),
-    new THREE.MeshPhongMaterial({ color: 0xffffff })
+    new THREE.MeshPhongMaterial({ color: 0x000000 })
   );
   scene.add(sphereMesh);
   sphereBody.position.set(0, sphereRestHeight + EPS, 0);
   sphereMesh.position.set(0, sphereRestHeight + EPS, 0);
 
-  let loader = new OBJLoader();
-  console.log("before callback");
-  loader.load("glbs/1408 White Blood Cell.obj", function (object) {
+  // let loader = new OBJLoader();
+  let loader = new GLTFLoader();
+  // console.log("before callback");
+  loader.load(WHITECELLOBJ, function (object) {
     scene.remove(sphereMesh);
-    sphereMesh = object.children[0].clone();
+    sphereMesh = object.scene.children[0].children[0].clone();
     sphereMesh.geometry.scale(objScale, objScale, objScale);
     sphereMesh.geometry.center();
     sphereMesh.position.set(0, sphereRestHeight + EPS, 0);
-    sphereMesh.castShadow = true;
+    sphereMesh.material = new THREE.MeshLambertMaterial({ color: 0xccd4a1 });
     scene.add(sphereMesh);
   });
 
@@ -231,12 +260,15 @@ function init() {
   sphereBody.addEventListener("collide", function (e) {
     if (e.body.mass == virusMass && health != null) {
       health.takeDamage(30);
+    } else if (e.body.mass == virusMass && health != null) {
+      health.takeDamage(60);
     }
   });
 
   // Create a virus.
   for (let i = 0; i < 100; i++) {
     let virus = new Virus(
+      // new THREE.Color(0x95db4f),
       new THREE.Vector3(
         10 + Math.floor(i * Math.random() * 5),
         sphereRestHeight,
@@ -294,6 +326,14 @@ function animate() {
       sphereMesh.position.copy(sphereBody.position);
       sphereMesh.quaternion.copy(sphereBody.quaternion);
 
+      // Update shadow of the sphere.
+      shadowMesh.position.x = sphereMesh.position.x;
+      shadowMesh.position.z = sphereMesh.position.z;
+      shadowMesh.material.opacity = Math.max(
+        0,
+        1 - (sphereMesh.position.y - sphereRad) / zeroShadowHeight
+      );
+
       // Check if sphere touches a viral tile
       updateCellsForParticle(sphereMesh);
 
@@ -307,6 +347,17 @@ function animate() {
         virus.mesh.position.copy(virus.body.position);
         virus.mesh.quaternion.copy(virus.body.quaternion);
         updateCellsForParticle(virus.mesh);
+      }
+
+      // Update grid cells and boss positions.
+      if (bosses.length) {
+        for (let i = 0; i < bosses.length; i++) {
+          let boss = bosses[i];
+          boss.handleWallCollisions();
+          boss.mesh.position.copy(boss.body.position);
+          boss.mesh.quaternion.copy(boss.body.quaternion);
+          updateCellsForParticle(boss.mesh);
+        }
       }
 
       renderer.render(scene, camera);
@@ -355,6 +406,45 @@ function animate() {
         // More random walking !
         viruses[i].randomWalk();
       }
+
+      if (LEVEL == 2) {
+        // add more viruses
+        let slipperyMaterial = new CANNON.Material("slipperyMaterial");
+        for (let i = 0; i < 10; i++) {
+          // Create a boss virus.
+          boss = new Boss(
+            new THREE.Vector3(
+              10 + Math.floor(i * Math.random() * 5),
+              bossRestHeight,
+              10 + i * 100
+            ),
+            slipperyMaterial,
+            world
+          );
+          bosses.push(boss);
+          scene.add(boss.mesh);
+        }
+      }
+
+      if (LEVEL == 3) {
+        // add more viruses
+        let slipperyMaterial = new CANNON.Material("slipperyMaterial");
+        for (let i = 0; i < 50; i++) {
+          let virus = new Virus(
+            new THREE.Color("blue"),
+            new THREE.Vector3(
+              10 + Math.floor(i * Math.random() * 5),
+              sphereRestHeight,
+              10 + i * 10
+            ),
+            slipperyMaterial,
+            world
+          );
+          viruses.push(virus);
+          scene.add(virus.mesh);
+        }
+      }
+
       state = "menu";
     }
   }
@@ -389,6 +479,9 @@ function createWall(length, position, rotate) {
       color: 0x8B0000,
       side: THREE.DoubleSide, 
       reflectivity: 0.1
+      // color: 0x75100e,
+      // opacity: 0.5,
+      // transparent: true,
     })
   );
 
@@ -526,9 +619,14 @@ function registerListeners() {
           // reset the game
           state = "reset";
         }
+        // enter game on menu with "enter"
         if (e.key === "Enter" && state == "menu") {
-          console.log("working");
           menu.startGame();
+        }
+        //
+        if (e.key === "l" && progress.state == "win") {
+          LEVEL++;
+          state = "reset";
         }
       },
       false

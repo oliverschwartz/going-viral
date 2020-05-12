@@ -4,7 +4,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const buildPath = "./build/";
 
 module.exports = {
-  entry: ["./src/app.js"],
+  entry: { index: "./src/app.js" },
   output: {
     path: path.join(__dirname, buildPath),
     filename: "[name].[hash].js",
@@ -15,8 +15,12 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.css$/,
-        include: /stylesheets|node_modules/,
+        test: /\.obj$/,
+        loader: "webpack-obj-loader",
+        exclude: path.resolve(__dirname, "./node_modules/"),
+      },
+      {
+        test: /\.css$/i,
         use: ["style-loader", "css-loader"],
       },
       {
@@ -37,7 +41,7 @@ module.exports = {
         exclude: path.resolve(__dirname, "./node_modules/"),
       },
       {
-        test: /\.(jpe?g|png|gif|svg|tga|gltf|babylon|mtl|pcb|pcd|prwm|obj|mat|mp3|ogg)$/i,
+        test: /\.(jpe?g|png|gif|svg|tga|gltf|glb|babylon|mtl|pcb|pcd|prwm|obj|mat|mp3|ogg)$/i,
         use: "file-loader",
         exclude: path.resolve(__dirname, "./node_modules/"),
       },
@@ -64,6 +68,7 @@ module.exports = {
       health$: path.resolve(__dirname, "src/components/health"),
       menu$: path.resolve(__dirname, "src/components/menu"),
       virus$: path.resolve(__dirname, "src/components/virus"),
+      boss$: path.resolve(__dirname, "src/components/boss"),
       lights$: path.resolve(__dirname, "src/components/lights"),
       objects$: path.resolve(__dirname, "src/components/objects"),
       scenes$: path.resolve(__dirname, "src/components/scenes"),
