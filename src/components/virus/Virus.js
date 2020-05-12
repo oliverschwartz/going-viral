@@ -15,16 +15,25 @@ const directions = {
   7: new CANNON.Vec3(-1, 0, -1),
 };
 
-const maxVelocity = 2.0;
-
 class Virus {
-  constructor(position, material, world) {
+  constructor(
+    radius,
+    color,
+    velocity,
+    impact,
+    mass,
+    position,
+    material,
+    world
+  ) {
     this.name = "virus";
-    this.radius = 0.5;
+    this.radius = radius;
+    this.impact = impact;
+    this.mass = mass;
+    const scale = radius * 0.1;
     const segments = 50;
-    const impact = 20;
+    this.maxVelocity = velocity;
 
-    let color = new THREE.Color(0x95db4f);
     // Create the THREE mesh.
     this.mesh = new THREE.Mesh(
       new THREE.SphereGeometry(this.radius, segments),
@@ -33,15 +42,13 @@ class Virus {
     this.mesh.position.set(position.x, position.y, position.z);
 
     var self = this;
-    // let loader = new OBJLoader();
     let loader = new GLTFLoader();
     loader.load(VIRUSOBJ, function (object) {
       APP.scene.remove(self.mesh);
       self.mesh = object.scene.children[0].children[0].clone();
-      self.mesh.geometry.scale(0.05, 0.05, 0.05);
+      self.mesh.geometry.scale(scale, scale, scale);
       self.mesh.geometry.center();
       self.mesh.position.set(position.x, position.y, position.z);
-      color.g += (Math.random() - 1) * 0.25;
       self.mesh.material = new THREE.MeshPhongMaterial({ color: color });
       self.mesh.castShadow = true;
       APP.scene.add(self.mesh);
@@ -50,7 +57,7 @@ class Virus {
     // Create the CANNON body.
     let shape = new CANNON.Sphere(this.radius);
     this.body = new CANNON.Body({
-      mass: APP.virusMass,
+      mass: this.mass,
       linearDamping: 0.5,
       angularDamping: 0,
       material: material,
@@ -108,11 +115,17 @@ class Virus {
     let c = normal.clone().scale(3 * dot);
     let newVelocity = velocity.clone().vsub(c).scale(1);
     newVelocity.x =
-      maxVelocity > Math.abs(newVelocity.x) ? maxVelocity : newVelocity.x;
+      this.maxVelocity > Math.abs(newVelocity.x)
+        ? this.maxVelocity
+        : newVelocity.x;
     newVelocity.y =
-      maxVelocity > Math.abs(newVelocity.y) ? maxVelocity : newVelocity.y;
+      this.maxVelocity > Math.abs(newVelocity.y)
+        ? this.maxVelocity
+        : newVelocity.y;
     newVelocity.z =
-      maxVelocity > Math.abs(newVelocity.z) ? maxVelocity : newVelocity.z;
+      this.maxVelocity > Math.abs(newVelocity.z)
+        ? this.maxVelocity
+        : newVelocity.z;
     return newVelocity;
   }
 
@@ -121,7 +134,7 @@ class Virus {
     if (state == "play") {
       let index = Math.floor(8 * Math.random());
       directions[index].normalize();
-      directions[index] = directions[index].scale(10);
+      directions[index] = directions[index].scale(this.impact);
       this.body.applyImpulse(directions[index], this.body.position);
     }
     let me = this;

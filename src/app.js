@@ -35,7 +35,6 @@ const objScale = 0.05;
 export const width = 20;
 export const height = 1000;
 export const planeRad = 1;
-export const virusMass = 1;
 export const bossMass = 20;
 export const planeColor = new THREE.Color(0x75100e);
 export var scene;
@@ -61,10 +60,36 @@ var planeMeshes = [],
   state,
   viruses = [],
   bosses = [],
+  blueViruses = [],
+  indigoViruses = [],
   menu,
   health,
   progress;
 var keys = [0, 0, 0, 0, 0]; // Up, Down, Left, Right, Jump!
+
+const virusProperties = {
+  LEVEL1: {
+    radius: 0.5,
+    color: new THREE.Color(0x95db4f),
+    velocity: 2.0,
+    impact: 10,
+    mass: 1,
+  },
+  LEVEL3: {
+    radius: 1.0,
+    color: new THREE.Color(0x00bfff),
+    velocity: 4.0,
+    impact: 50,
+    mass: 5,
+  },
+  LEVEL4: {
+    radius: 0.3,
+    color: new THREE.Color("indigo"),
+    velocity: 6.0,
+    impact: 30,
+    mass: 1,
+  },
+};
 
 /***************************************************************************/
 /* INITIALIZATION */
@@ -232,7 +257,7 @@ function init() {
   world.add(sphereBody);
   sphereMesh = new THREE.Mesh(
     new THREE.SphereGeometry(sphereRad, 100, 100),
-    new THREE.MeshPhongMaterial({ color: 0x000000 })
+    new THREE.MeshPhongMaterial({ color: 0xffffff })
   );
   scene.add(sphereMesh);
   sphereBody.position.set(0, sphereRestHeight + EPS, 0);
@@ -240,7 +265,6 @@ function init() {
 
   // let loader = new OBJLoader();
   let loader = new GLTFLoader();
-  // console.log("before callback");
   loader.load(WHITECELLOBJ, function (object) {
     scene.remove(sphereMesh);
     sphereMesh = object.scene.children[0].children[0].clone();
@@ -253,20 +277,35 @@ function init() {
 
   // Add event listeners for health damage.
   sphereBody.addEventListener("collide", function (e) {
-    if (e.body.mass == virusMass && health != null) {
-      health.takeDamage(30);
-    } else if (e.body.mass == virusMass && health != null) {
+    if (e.body.mass == virusProperties["LEVEL1"].mass && health != null) {
+      health.takeDamage(25);
+    } else if (e.body.mass == bossMass && health != null) {
       health.takeDamage(60);
+    } else if (
+      e.body.mass == virusProperties["LEVEL3"].mass &&
+      health != null
+    ) {
+      health.takeDamage(45);
+    } else if (
+      e.body.mass == virusProperties["LEVEL4"].mass &&
+      health != null
+    ) {
+      health.takeDamage(30);
     }
   });
 
   // Create a virus.
   for (let i = 0; i < 100; i++) {
+    // virus (radius, color, velocity, impact, position, material, world) {
     let virus = new Virus(
-      // new THREE.Color(0x95db4f),
+      virusProperties["LEVEL1"].radius,
+      virusProperties["LEVEL1"].color,
+      virusProperties["LEVEL1"].velocity,
+      virusProperties["LEVEL1"].impact,
+      virusProperties["LEVEL1"].mass,
       new THREE.Vector3(
         10 + Math.floor(i * Math.random() * 5),
-        sphereRestHeight,
+        virusProperties["LEVEL1"].radius,
         10 + i * 10
       ),
       slipperyMaterial,
@@ -275,7 +314,6 @@ function init() {
     viruses.push(virus);
     scene.add(virus.mesh);
   }
-
   // Go to menu
   state = "menu";
 }
@@ -336,24 +374,10 @@ function animate() {
       progress.updateBar(sphereMesh.position.z);
 
       // Update grid cells and virus positions.
-      for (let i = 0; i < viruses.length; i++) {
-        let virus = viruses[i];
-        virus.handleWallCollisions();
-        virus.mesh.position.copy(virus.body.position);
-        virus.mesh.quaternion.copy(virus.body.quaternion);
-        updateCellsForParticle(virus.mesh);
-      }
-
-      // Update grid cells and boss positions.
-      if (bosses.length) {
-        for (let i = 0; i < bosses.length; i++) {
-          let boss = bosses[i];
-          boss.handleWallCollisions();
-          boss.mesh.position.copy(boss.body.position);
-          boss.mesh.quaternion.copy(boss.body.quaternion);
-          updateCellsForParticle(boss.mesh);
-        }
-      }
+      updateViruses(viruses);
+      updateViruses(bosses);
+      updateViruses(blueViruses);
+      updateViruses(indigoViruses);
 
       renderer.render(scene, camera);
       break;
@@ -402,42 +426,26 @@ function animate() {
         viruses[i].randomWalk();
       }
 
+      cleanViruses(bosses);
+      cleanViruses(blueViruses);
+      cleanViruses(indigoViruses);
+
       if (LEVEL == 2) {
-        // add more viruses
-        let slipperyMaterial = new CANNON.Material("slipperyMaterial");
-        for (let i = 0; i < 10; i++) {
-          // Create a boss virus.
-          boss = new Boss(
-            new THREE.Vector3(
-              10 + Math.floor(i * Math.random() * 5),
-              bossRestHeight,
-              10 + i * 100
-            ),
-            slipperyMaterial,
-            world
-          );
-          bosses.push(boss);
-          scene.add(boss.mesh);
-        }
+        addBosses();
       }
 
       if (LEVEL == 3) {
-        // add more viruses
-        let slipperyMaterial = new CANNON.Material("slipperyMaterial");
-        for (let i = 0; i < 50; i++) {
-          let virus = new Virus(
-            new THREE.Color("blue"),
-            new THREE.Vector3(
-              10 + Math.floor(i * Math.random() * 5),
-              sphereRestHeight,
-              10 + i * 10
-            ),
-            slipperyMaterial,
-            world
-          );
-          viruses.push(virus);
-          scene.add(virus.mesh);
-        }
+        addBosses();
+        addViruses("LEVEL3", 30, blueViruses);
+      }
+
+      if (LEVEL == 4) {
+        addBosses();
+        addViruses("LEVEL3", 50, blueViruses);
+        addViruses("LEVEL4", 40, indigoViruses);
+      }
+      if (progress.state == "gameover") {
+        LEVEL = 1;
       }
 
       state = "menu";
@@ -486,7 +494,6 @@ function focusCamera() {
 
 function handleWallCollisions() {
   let velocity = sphereBody.velocity.clone();
-  // console.log(velocity);
   // +x wall
   if (sphereBody.position.x > width - planeRad - sphereRad) {
     sphereBody.position.x = width - planeRad - sphereRad - EPS;
@@ -547,7 +554,6 @@ function applyImpulses() {
           break;
         case 4: // Jump! (only if not in the air) if Spacebar
           if (sphereBody.position.y <= sphereRestHeight + EPS) {
-            // console.log("JUMPING!");
             sphereBody.applyImpulse(
               new CANNON.Vec3(0, 5, 0),
               sphereBody.position
@@ -643,6 +649,77 @@ function addSounds() {
     shrekSound.setVolume(0.5);
     shrekSound.play();
   });
+}
+
+function cleanViruses(viruses) {
+  if (viruses.length) {
+    for (let i = 0; i < viruses.length; i++) {
+      viruses[i].mesh.geometry.dispose();
+      viruses[i].mesh.material.dispose();
+      world.remove(viruses[i].body);
+      scene.remove(viruses[i].mesh);
+      viruses[i].mesh = undefined;
+      viruses[i] = undefined;
+    }
+    viruses.length = 0;
+  }
+}
+
+function addBosses() {
+  // add bosses
+  let slipperyMaterial = new CANNON.Material("slipperyMaterial");
+  for (let i = 0; i < 10; i++) {
+    // Create a boss virus.
+    boss = new Boss(
+      new THREE.Vector3(
+        10 + Math.floor(i * Math.random() * 7),
+        bossRestHeight,
+        10 + i * 100
+      ),
+      slipperyMaterial,
+      world
+    );
+    bosses.push(boss);
+    scene.add(boss.mesh);
+  }
+}
+
+function addViruses(level, number, list) {
+  // add more viruses
+  let slipperyMaterial = new CANNON.Material("slipperyMaterial");
+  for (let i = 0; i < number; i++) {
+    let virus = new Virus(
+      virusProperties[level].radius,
+      virusProperties[level].color,
+      virusProperties[level].velocity,
+      virusProperties[level].impact,
+      virusProperties[level].mass,
+      new THREE.Vector3(
+        10 + Math.floor(i * Math.random() * 8),
+        virusProperties[level].radius,
+        10 + i * Math.floor(height / number)
+      ),
+      slipperyMaterial,
+      world
+    );
+    list.push(virus);
+    scene.add(virus.mesh);
+  }
+}
+
+function updateViruses(viruses) {
+  if (viruses.length) {
+    for (let i = 0; i < viruses.length; i++) {
+      if (!viruses[i]) {
+        continue;
+      }
+      let virus = viruses[i];
+      virus.handleWallCollisions();
+      virus.mesh.position.copy(virus.body.position);
+      virus.mesh.quaternion.copy(virus.body.quaternion);
+      updateCellsForParticle(virus.mesh);
+    }
+  }
 }
 
 export function getFloor() {

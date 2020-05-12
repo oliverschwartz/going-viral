@@ -12,7 +12,7 @@ class Boss {
     this.radius = 2;
     const segments = 50;
     this.impact = 200;
-    // const color = new THREE.Color("red");
+    const color = new THREE.Color("pink");
 
     // Create the THREE mesh.
     this.mesh = new THREE.Mesh(
@@ -29,12 +29,10 @@ class Boss {
       self.mesh.geometry.scale(0.2, 0.2, 0.2);
       self.mesh.geometry.center();
       self.mesh.position.set(position.x, position.y, position.z);
-      self.mesh.material = new THREE.MeshPhongMaterial({
-        color: new THREE.Color("pink"),
-      });
-
       color.g += (Math.random() - 1) * 0.25;
-      self.mesh.material.color = color;
+      self.mesh.material = new THREE.MeshPhongMaterial({
+        color: color,
+      });
       self.mesh.castShadow = true;
       APP.scene.add(self.mesh);
     });
