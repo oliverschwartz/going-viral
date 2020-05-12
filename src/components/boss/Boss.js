@@ -12,7 +12,7 @@ class Boss {
     this.radius = 2;
     const segments = 50;
     this.impact = 200;
-    // const color = new THREE.Color("red");
+    const color = new THREE.Color("red");
 
     // Create the THREE mesh.
     this.mesh = new THREE.Mesh(

@@ -23,26 +23,13 @@ class Health {
     // }
   }
 
-  addHealth() {
+  addHealth(heal) {
     if (this.curHealth == this.maxHealth) {
-      $(".message-box").html("You are already at full health");
     } else {
-      let heal = Math.floor(Math.random() * 100 + 5);
       $(".health-bar-red, .health-bar-blue, .health-bar").stop();
       this.curHealth = this.curHealth + heal;
       if (this.curHealth > this.maxHealth) {
         this.curHealth = this.maxHealth;
-        $(".message-box").html("You're at full health");
-      } else if (this.curHealth == 0) {
-        $(".message-box").html(
-          "Miraculously! You regained your health by " +
-            heal +
-            " points and get back on to your feet!"
-        );
-      } else {
-        $(".message-box").html(
-          "You regained your health by " + heal + " points!"
-        );
       }
       this.applyChange();
     }

@@ -8,6 +8,7 @@ import { Boss } from "boss";
 import * as MENU from "menu";
 import { Health } from "health";
 import { Progress } from "progress";
+import { Upgrade } from "upgrade";
 import ORGAN from "../assets/organ.jpg";
 import BACKGROUND from "../assets/bg.jpg";
 import ROUNDSHADOW from "../assets/roundshadow.png";
@@ -43,6 +44,8 @@ export var damageSound;
 export var shrekSound;
 export const sphereRestHeight = 0.5;
 export const bossRestHeight = 2.5;
+export var health;
+var upgrades = [];
 var shadowMesh;
 const zeroShadowHeight = 8;
 var boss;
@@ -62,7 +65,6 @@ var planeMeshes = [],
   viruses = [],
   bosses = [],
   menu,
-  health,
   progress;
 var keys = [0, 0, 0, 0, 0]; // Up, Down, Left, Right, Jump!
 
@@ -104,6 +106,10 @@ function init() {
 
   // Add some sound.
   // addSounds();
+
+  // Add some upgrades. 
+  let upgrade = new Upgrade(new THREE.Vector3(5,0.8,5), "spray");
+  upgrades.push(upgrade);
 
   // Set up camera
   camera.position.set(-camDistXZ, camHeightAbove, 0);
@@ -355,6 +361,12 @@ function animate() {
         }
       }
 
+      // Update the upgrades. 
+      for (let i = 0; i < upgrades.length; i++) {
+        let upgrade = upgrades[i];
+        upgrade.handleCollisions(sphereMesh.position.clone());
+      }
+
       renderer.render(scene, camera);
       break;
     }
@@ -363,6 +375,11 @@ function animate() {
       // Clear current display screen
       menu.clearWin();
       menu.clearGameover();
+
+      // Reset all the upgrades. 
+      for (let i = 0; i < upgrades.length; i++) {
+        upgrades[i].reset();
+      }
 
       // Reset physics of sphere
       sphereBody.position.set(0, sphereRestHeight + EPS, 0);
