@@ -4,6 +4,7 @@ import * as APP from "../../app.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import VIRUSOBJ from "../../../glbs/1409 Virus2.glb";
 
+
 const directions = {
   0: new CANNON.Vec3(1, 0, 0),
   1: new CANNON.Vec3(-1, 0, 0),

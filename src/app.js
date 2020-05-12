@@ -8,6 +8,9 @@ import { Boss } from "boss";
 import * as MENU from "menu";
 import { Health } from "health";
 import { Progress } from "progress";
+import { Upgrade } from "upgrade";
+import { Perlin } from "perlin";
+
 import ORGAN from "../assets/organ.jpg";
 import BACKGROUND from "../assets/bg.jpg";
 import ROUNDSHADOW from "../assets/roundshadow.png";
@@ -40,8 +43,11 @@ export const planeColor = new THREE.Color(0x75100e);
 export var scene;
 export var damageSound;
 export var shrekSound;
+export var healSound;
 export const sphereRestHeight = 0.5;
 export const bossRestHeight = 2.5;
+export var health;
+var upgrades = [];
 var shadowMesh;
 const zeroShadowHeight = 8;
 var boss;
@@ -63,9 +69,14 @@ var planeMeshes = [],
   blueViruses = [],
   indigoViruses = [],
   menu,
-  health,
   progress;
 var keys = [0, 0, 0, 0, 0]; // Up, Down, Left, Right, Jump!
+var date,
+  pn,
+  longWall1,
+  longWall2,
+  shortWall1,
+  shortWall2;
 
 const virusProperties = {
   LEVEL1: {
@@ -135,7 +146,11 @@ function init() {
   renderer = new THREE.WebGLRenderer({ antialias: true });
 
   // Add some sound.
-  // addSounds();
+  addSounds();
+
+  // Add some upgrades. 
+  let upgrade = new Upgrade(new THREE.Vector3(5,0.8,5), "spray");
+  upgrades.push(upgrade);
 
   // Set up camera
   camera.position.set(-camDistXZ, camHeightAbove, 0);
@@ -209,10 +224,10 @@ function init() {
         new THREE.MeshLambertMaterial({
           side: THREE.DoubleSide,
           color: planeColor,
-          opacity: 0.8,
+          opacity: 0.2,
           map: organTexture,
           transparent: false,
-          emissive: 0x321616,
+          emissive: 0x4D2D26,
         })
       );
       scene.add(planeMesh);
@@ -221,6 +236,16 @@ function init() {
       planeMeshes.push(planeMesh);
     }
   }
+
+  // initalize perlin variables
+	date = new Date();
+  pn = new Perlin('rnd' + date.getTime());
+
+  // Create 4 walls and add them to the scene 
+  longWall1 = createWall(height, new CANNON.Vec3(width, 1, height / 2 - planeRad));
+  longWall2 = createWall(height, new CANNON.Vec3(0 - planeRad * 2, 1, height / 2 - planeRad));
+  shortWall1 = createWall(width, new CANNON.Vec3(width / 2 - planeRad, 1, height), true);
+  shortWall2 = createWall(width, new CANNON.Vec3(width / 2 - planeRad, 1, -planeRad * 2), true);
 
   // Load the shadow texture.
   let shadowLoader = new THREE.TextureLoader();
@@ -236,19 +261,6 @@ function init() {
   shadowMesh.rotation.x = -Math.PI / 2;
   shadowMesh.position.y += 2 * EPS;
   scene.add(shadowMesh);
-
-  // Create 4 walls.
-  createWall(height, new CANNON.Vec3(width, 1, height / 2 - planeRad));
-  createWall(
-    height,
-    new CANNON.Vec3(0 - planeRad * 2, 1, height / 2 - planeRad)
-  );
-  createWall(width, new CANNON.Vec3(width / 2 - planeRad, 1, height), true);
-  createWall(
-    width,
-    new CANNON.Vec3(width / 2 - planeRad, 1, -planeRad * 2),
-    true
-  );
 
   // Create a sphere.
   sphereRad = 0.5;
@@ -386,6 +398,12 @@ function animate() {
       updateViruses(blueViruses);
       updateViruses(indigoViruses);
 
+      // Update the upgrades. 
+      for (let i = 0; i < upgrades.length; i++) {
+        let upgrade = upgrades[i];
+        upgrade.handleCollisions(sphereMesh.position.clone());
+      }
+
       renderer.render(scene, camera);
       break;
     }
@@ -397,6 +415,11 @@ function animate() {
       // Clear current display screen
       menu.clearWin();
       menu.clearGameover();
+
+      // Reset all the upgrades. 
+      for (let i = 0; i < upgrades.length; i++) {
+        upgrades[i].reset();
+      }
 
       // Reset physics of sphere
       sphereBody.position.set(0, sphereRestHeight + EPS, 0);
@@ -470,20 +493,47 @@ function animate() {
     as we handle collisions manually. 
 */
 function createWall(length, position, rotate) {
-  let wallGeometry = new THREE.BoxGeometry(planeRad * 2, planeRad * 2, length);
+  let wallGeometry = new THREE.PlaneGeometry(planeRad * 2, length, 40, 700);
+  
+  // Apply Perlin noise
+  for (var i = 0, l = wallGeometry.vertices.length; i < l; i++) {
+    var vertex = wallGeometry.vertices[i];
+    var value = pn.noise(vertex.x , vertex.y , 0);
+    vertex.z = value ;
+  }
+
+  //ensure light is computed correctly
+  wallGeometry.computeFaceNormals();
+  wallGeometry.computeVertexNormals();
+
   let wallMesh = new THREE.Mesh(
     wallGeometry,
     new THREE.MeshLambertMaterial({
-      color: 0x75100e,
-      opacity: 0.5,
-      transparent: true,
+      color: 0x8B0000,
+      side: THREE.DoubleSide, 
+      reflectivity: 0.1
+      // color: 0x75100e,
+      // opacity: 0.5,
+      // transparent: true,
     })
   );
+
   scene.add(wallMesh);
   wallMesh.position.set(position.x, position.y, position.z);
-  if (rotate) {
-    wallMesh.rotation.y = Math.PI / 2;
+  wallMesh.rotation.x = -Math.PI / 2;
+  if (rotate) { // short walls
+    wallMesh.rotation.z = Math.PI / 2;
+    wallMesh.rotation.x += Math.PI / 2;
+    if (position.z < height/2) wallMesh.position.set(position.x, position.y, position.z+0.6); // start
+    else wallMesh.position.set(position.x, position.y, position.z-1.3); // finish 
   }
+  else { // long walls
+    wallMesh.rotation.y += Math.PI / 2;
+    if (position.x < width) wallMesh.position.set(position.x+.7, position.y, position.z); // left
+    else wallMesh.position.set(position.x-1.5, position.y, position.z); // right
+  }
+
+  return wallMesh;
 }
 
 // Ensure the camera is aligned with the sphere's direction of travel.
@@ -655,6 +705,12 @@ function addSounds() {
     shrekSound.setLoop(true);
     shrekSound.setVolume(0.5);
     shrekSound.play();
+  });
+
+  let soundLoader3 = new THREE.AudioLoader();
+  healSound = new THREE.Audio(audioListener);
+  soundLoader3.load("audio/heal.mp3", function (audioBuffer) {
+    healSound.setBuffer(audioBuffer); 
   });
 }
 
