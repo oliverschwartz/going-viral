@@ -1,19 +1,17 @@
 {
-  "name": "give-it-a-name",
-  "repository": "graphics",
+  "name": "Going Viral",
+  "repository": "going-viral",
   "version": "0.1.0",
   "title": "package",
-  "description": "SHORT DESCRIPTION OF PROJECT HERE. ONE TO TWO SENTENCES MAX",
+  "description": "An arcade-style survival game. Beat the viruses and get to the finish!",
   "keywords": [
     "Princeton",
     "graphics",
     "three.js",
-    "COS 426",
-    "ivy league",
-    "keyword1",
-    "keyword2",
-    "...",
-    "this last entry CANNOT have a comma after it ->"
+    "cannon.js",
+    "teamwork",
+    "fun",
+    "COVID-19"
   ],
   "scripts": {
     "start": "webpack-dev-server --mode development --output-public-path '/'",
