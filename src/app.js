@@ -149,7 +149,7 @@ function init() {
   const interval = height / NUM_UPGRADES; 
   const buffer = 5; 
   for (let i = 0; i < NUM_UPGRADES; i++) {
-    let x_pos = Math.random() * width; 
+    let x_pos = Math.min(Math.max(Math.random() * width, 2), width - 2); 
     let z_pos = interval * i + buffer;
     let type = types[Math.floor(Math.random() * types.length)];
     let upgrade = new Upgrade(new THREE.Vector3(x_pos, 0.8, z_pos), type);
