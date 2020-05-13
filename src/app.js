@@ -32,6 +32,7 @@ const organTexture = new THREE.TextureLoader().load(ORGAN);
 /***************************************************************************/
 /* CONSTANTS AND VARIABLES */
 
+const WINNINGSCORE = 99;
 export const EPS = 0.05;
 const impact = 10;
 const objScale = 0.05;
@@ -45,6 +46,7 @@ export var scene;
 export var damageSound;
 export var shrekSound;
 export var healSound;
+export var winSound;
 export const sphereRestHeight = 0.5;
 export const bossRestHeight = 2.5;
 export var health;
@@ -55,7 +57,7 @@ var boss;
 export let LEVEL = 1;
 const dt = 1 / 60;
 const camDistXZ = 5;
-const camHeightAbove = 3;
+const camHeightAbove = 2.7;
 const angle = (3 * Math.PI) / 180;
 var world;
 var controls, renderer, scene, camera;
@@ -69,6 +71,7 @@ var planeMeshes = [],
   bosses = [],
   blueViruses = [],
   indigoViruses = [],
+  yellowViruses = [],
   menu,
   progress;
 var keys = [0, 0, 0, 0, 0]; // Up, Down, Left, Right, Jump!
@@ -102,6 +105,13 @@ const virusProperties = {
     velocity: 6.0,
     impact: 30,
     mass: 1,
+  },
+  LEVEL5: {
+    radius: 4.0,
+    color: new THREE.Color("yellow"),
+    velocity: 10.0,
+    impact: 400,
+    mass: 60,
   },
 };
 
@@ -329,6 +339,11 @@ function init() {
       health != null
     ) {
       health.takeDamage(25);
+    } else if (
+      e.body.mass == virusProperties["LEVEL5"].mass &&
+      health != null
+    ) {
+      health.takeDamage(90);
     }
   });
 
@@ -354,7 +369,10 @@ function animate() {
       if (health == null) health = new Health();
 
       // Player wins!
-      if (progress.r > 99 && progress.state != "gameover") {
+      if (progress.r > WINNINGSCORE && progress.state != "gameover") {
+        if (progress.state != "win") {
+          winSound.play();
+        }
         menu.showWin();
         progress.state = "win";
       }
@@ -398,6 +416,7 @@ function animate() {
       updateViruses(bosses);
       updateViruses(blueViruses);
       updateViruses(indigoViruses);
+      updateViruses(yellowViruses);
 
       // Update the upgrades.
       for (let i = 0; i < upgrades.length; i++) {
@@ -434,6 +453,7 @@ function animate() {
       // Reset health and progress
       health = new Health();
       health.applyChange();
+
       progress = new Progress();
       progress.updateBar();
 
@@ -466,6 +486,7 @@ function animate() {
       cleanViruses(bosses);
       cleanViruses(blueViruses);
       cleanViruses(indigoViruses);
+      cleanViruses(yellowViruses);
 
       if (LEVEL == 2) {
         addBosses("LEVEL2", 10, bosses);
@@ -480,6 +501,13 @@ function animate() {
         addBosses("LEVEL2", 10, bosses);
         addViruses("LEVEL3", 50, blueViruses);
         addBosses("LEVEL4", 40, indigoViruses);
+      }
+
+      if (LEVEL == 5) {
+        addBosses("LEVEL2", 10, bosses);
+        addViruses("LEVEL3", 50, blueViruses);
+        addBosses("LEVEL4", 40, indigoViruses);
+        addViruses("LEVEL5", 5, yellowViruses);
       }
 
       state = "menu";
@@ -516,9 +544,6 @@ function createWall(length, position, rotate) {
       color: 0x8b0000,
       side: THREE.DoubleSide,
       reflectivity: 0.1,
-      // color: 0x75100e,
-      // opacity: 0.5,
-      // transparent: true,
     })
   );
 
@@ -721,6 +746,12 @@ function addSounds() {
   soundLoader3.load("audio/heal.mp3", function (audioBuffer) {
     healSound.setBuffer(audioBuffer);
   });
+
+  let soundLoader4 = new THREE.AudioLoader();
+  winSound = new THREE.Audio(audioListener);
+  soundLoader4.load("audio/win.mp3", function (audioBuffer) {
+    winSound.setBuffer(audioBuffer);
+  });
 }
 
 function cleanViruses(viruses) {
@@ -750,7 +781,7 @@ function addBosses(level, number, list) {
       new THREE.Vector3(
         1 + Math.floor(Math.random() * width - 1),
         virusProperties[level].radius,
-        1 + Math.floor((i * height) / number)
+        15 + Math.floor((i * height) / number)
       ),
       slipperyMaterial,
       world
@@ -773,7 +804,7 @@ function addViruses(level, number, list) {
       new THREE.Vector3(
         1 + Math.floor(Math.random() * width - 1),
         virusProperties[level].radius,
-        1 + Math.floor((i * height) / number)
+        15 + Math.floor((i * height) / number)
       ),
       slipperyMaterial,
       world
