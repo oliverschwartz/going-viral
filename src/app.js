@@ -32,11 +32,11 @@ const organTexture = new THREE.TextureLoader().load(ORGAN);
 /***************************************************************************/
 /* CONSTANTS AND VARIABLES */
 
-const WINNINGSCORE = 99;
+const WINNINGSCORE = 10;
 export const EPS = 0.05;
 const impact = 10;
 const objScale = 0.05;
-const NUM_UPGRADES = 10; 
+const NUM_UPGRADES = 10;
 export const width = 20;
 export const height = 1000;
 export const planeRad = 1;
@@ -155,11 +155,11 @@ function init() {
   addSounds();
 
   // Add some upgrades.
-  const types = ["toilet_roll", "spray"]
-  const interval = height / NUM_UPGRADES; 
-  const buffer = 5; 
+  const types = ["toilet_roll", "spray"];
+  const interval = height / NUM_UPGRADES;
+  const buffer = 5;
   for (let i = 0; i < NUM_UPGRADES; i++) {
-    let x_pos = Math.min(Math.max(Math.random() * width, 2), width - 2); 
+    let x_pos = Math.min(Math.max(Math.random() * width, 2), width - 2);
     let z_pos = interval * i + buffer;
     let type = types[Math.floor(Math.random() * types.length)];
     let upgrade = new Upgrade(new THREE.Vector3(x_pos, 0.8, z_pos), type);
@@ -369,16 +369,22 @@ function animate() {
       if (health == null) health = new Health();
 
       // Player wins!
-      if (progress.r > WINNINGSCORE && progress.state != "gameover") {
-        if (progress.state != "win") {
-          winSound.play();
-        }
+      if (
+        progress.r > WINNINGSCORE &&
+        progress.state != "gameover" &&
+        progress.state != "win"
+      ) {
         menu.showWin();
+        winSound.play();
         progress.state = "win";
       }
 
       // Game over ! :(
-      if (health.curHealth == 0 && progress.state != "win") {
+      if (
+        health.curHealth == 0 &&
+        progress.state != "win" &&
+        progress.state != "gameover"
+      ) {
         progress.state = "gameover";
         menu.showGameover();
       }
@@ -422,7 +428,7 @@ function animate() {
       for (let i = 0; i < upgrades.length; i++) {
         let upgrade = upgrades[i];
         if (upgrade.mesh !== undefined) {
-          upgrade.mesh.rotation.y += 0.02; 
+          upgrade.mesh.rotation.y += 0.02;
           upgrade.handleCollisions(sphereMesh.position.clone());
         }
       }
