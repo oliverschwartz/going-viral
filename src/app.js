@@ -152,7 +152,7 @@ function init() {
   renderer = new THREE.WebGLRenderer({ antialias: true });
 
   // Add some sound.
-  addSounds();
+  // addSounds();
 
   // Add some upgrades.
   const types = ["toilet_roll", "spray"];
@@ -360,6 +360,7 @@ function animate() {
       menu = new MENU.Menu();
       if (menu.newState == "play") {
         state = menu.newState;
+        addSounds(); 
       }
       break;
     }
