@@ -23,6 +23,7 @@ import DAMAGESOUND from "../audio/damage.mp3";
 import SHREKSOUND from "../audio/shreksophone.mp3";
 import HEALSOUND from "../audio/heal.mp3";
 import WINSOUND from "../audio/win.mp3";
+import CARDIB from "../audio/cardiB.mp3";
 
 import levelCSS from "./css/level.css";
 import menuCSS from "./css/menu.css";
@@ -778,7 +779,7 @@ function addSounds() {
 
   let soundLoader5 = new THREE.AudioLoader();
   cardiBSound = new THREE.Audio(audioListener);
-  soundLoader5.load("audio/cardiB.mp3", function (audioBuffer) {
+  soundLoader5.load(CARDIB, function (audioBuffer) {
     cardiBSound.setBuffer(audioBuffer);
   });
 }
