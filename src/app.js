@@ -34,11 +34,7 @@ const organTexture = new THREE.TextureLoader().load(ORGAN);
 /***************************************************************************/
 /* CONSTANTS AND VARIABLES */
 
-const WINNINGSCORE = 99;
 export const EPS = 0.05;
-const impact = 10;
-const objScale = 0.05;
-const NUM_UPGRADES = 10;
 export const width = 20;
 export const height = 1000;
 export const planeRad = 1;
@@ -53,20 +49,25 @@ export var cardiBSound;
 export const sphereRestHeight = 0.5;
 export const bossRestHeight = 2.5;
 export var health;
-var upgrades = [];
-var shadowMesh;
-const zeroShadowHeight = 8;
-var boss;
 export let LEVEL = 1;
+export var sphereBody;
+const WINNINGSCORE = 99;
+const impact = 10;
+const objScale = 0.05;
+const NUM_UPGRADES = 10;
+const zeroShadowHeight = 8;
 const MAXLEVEL = 5;
 const dt = 1 / 60;
 const camDistXZ = 5;
 const camHeightAbove = 2.7;
 const angle = (3 * Math.PI) / 180;
+var upgrades = [];
+var shadowMesh;
+var boss;
 var world;
-var controls, renderer, scene, camera;
-export var sphereBody;
-var planeMeshes = [],
+var renderer, scene, camera;
+var initialCellPos,
+  planeMeshes = [],
   sphereMesh,
   sphereRad,
   sphereDir,
@@ -299,7 +300,7 @@ function init() {
 
   // Create a sphere.
   sphereRad = 0.5;
-  sphereDir = new THREE.Vector3(1, 0, 0);
+  sphereDir = new THREE.Vector3(0, 0, 1); // Initialize cell to look forward
   let sphereShape = new CANNON.Sphere(sphereRad);
   sphereBody = new CANNON.Body({
     mass: 1,
@@ -314,8 +315,10 @@ function init() {
     new THREE.MeshPhongMaterial({ color: 0xffffff })
   );
   scene.add(sphereMesh);
-  sphereBody.position.set(0, sphereRestHeight + EPS, 0);
-  sphereMesh.position.set(0, sphereRestHeight + EPS, 0);
+  initialCellPos = new THREE.Vector3(width/2, sphereRestHeight + EPS, 2);
+  sphereBody.position.set(initialCellPos.x, initialCellPos.y, initialCellPos.z);
+  debugger;
+  sphereMesh.position.set(initialCellPos.x, initialCellPos.y, initialCellPos.z);
 
   // let loader = new OBJLoader();
   let loader = new GLTFLoader();
@@ -324,7 +327,7 @@ function init() {
     sphereMesh = object.scene.children[0].children[0].clone();
     sphereMesh.geometry.scale(objScale, objScale, objScale);
     sphereMesh.geometry.center();
-    sphereMesh.position.set(0, sphereRestHeight + EPS, 0);
+    sphereMesh.position.set(initialCellPos.x, initialCellPos.y, initialCellPos.z);
     sphereMesh.material = new THREE.MeshLambertMaterial({ color: 0xd6d6d6 });
     scene.add(sphereMesh);
   });
@@ -353,6 +356,7 @@ function init() {
     }
   });
 
+  // Add level 1 viruses 
   addViruses("LEVEL1", 80, viruses);
 
   // Go to menu
@@ -466,10 +470,11 @@ function animate() {
       }
 
       // Reset physics of sphere
-      sphereBody.position.set(0, sphereRestHeight + EPS, 0);
+      sphereBody.position.set(initialCellPos.x, initialCellPos.y, initialCellPos.z);
       sphereBody.velocity = new CANNON.Vec3(0, 0, 0);
       // Reset rendering of sphere
-      sphereMesh.position.set(0, sphereRestHeight + EPS, 0);
+      sphereMesh.position.set(initialCellPos.x, initialCellPos.y, initialCellPos.z);
+      sphereDir = new THREE.Vector3(0, 0, 1);
 
       // Reset health and progress
       health = new Health();
@@ -854,7 +859,7 @@ function resetBabyViruses(viruses) {
     var newVirusPos = new THREE.Vector3(
       1 + Math.floor(Math.random() * width - 1),
       virusProperties["LEVEL1"].radius,
-      1 + Math.floor((i * height) / viruses.length)
+      15 + Math.floor((i * height) / viruses.length)
     );
     // Reset physics
     viruses[i].body.position.set(newVirusPos.x, newVirusPos.y, newVirusPos.z);
