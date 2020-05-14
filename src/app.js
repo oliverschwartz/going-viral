@@ -18,6 +18,12 @@ import ROUNDSHADOW from "../assets/roundshadow.png";
 
 import WHITECELLOBJ from "../glbs/1408 White Blood Cell.glb";
 
+// sounds
+import DAMAGESOUND from "../audio/damage.mp3";
+import SHREKSOUND from "../audio/shreksophone.mp3";
+import HEALSOUND from "../audio/heal.mp3";
+import WINSOUND from "../audio/win.mp3";
+
 import levelCSS from "./css/level.css";
 import menuCSS from "./css/menu.css";
 import healthCSS from "./css/health.css";
@@ -745,13 +751,13 @@ function addSounds() {
 
   damageSound = new THREE.Audio(audioListener);
   let soundLoader1 = new THREE.AudioLoader();
-  soundLoader1.load("audio/damage.mp3", function (audioBuffer) {
+  soundLoader1.load(DAMAGESOUND, function (audioBuffer) {
     damageSound.setBuffer(audioBuffer);
   });
 
   let soundLoader2 = new THREE.AudioLoader();
   shrekSound = new THREE.Audio(audioListener);
-  soundLoader2.load("audio/shreksophone.mp3", function (audioBuffer) {
+  soundLoader2.load(SHREKSOUND, function (audioBuffer) {
     shrekSound.setBuffer(audioBuffer);
     shrekSound.setLoop(true);
     shrekSound.setVolume(0.5);
@@ -760,13 +766,13 @@ function addSounds() {
 
   let soundLoader3 = new THREE.AudioLoader();
   healSound = new THREE.Audio(audioListener);
-  soundLoader3.load("audio/heal.mp3", function (audioBuffer) {
+  soundLoader3.load(HEALSOUND, function (audioBuffer) {
     healSound.setBuffer(audioBuffer);
   });
 
   let soundLoader4 = new THREE.AudioLoader();
   winSound = new THREE.Audio(audioListener);
-  soundLoader4.load("audio/win.mp3", function (audioBuffer) {
+  soundLoader4.load(WINSOUND, function (audioBuffer) {
     winSound.setBuffer(audioBuffer);
   });
 
