@@ -1,15 +1,16 @@
 import * as THREE from "three";
 import * as CANNON from "cannon";
+import * as MENU from "menu";
 import { BasicLights } from "lights";
 import { updateCellsForParticle, resetRender } from "./updateRender.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { Virus } from "virus";
 import { Boss } from "boss";
-import * as MENU from "menu";
 import { Health } from "health";
 import { Progress } from "progress";
 import { Upgrade } from "upgrade";
 import { Perlin } from "perlin";
+import { Level } from "level";
 
 import ORGAN from "../assets/organ.jpg";
 import BACKGROUND from "../assets/bg.jpg";
@@ -17,6 +18,7 @@ import ROUNDSHADOW from "../assets/roundshadow.png";
 
 import WHITECELLOBJ from "../glbs/1408 White Blood Cell.glb";
 
+import levelCSS from "./css/level.css";
 import menuCSS from "./css/menu.css";
 import healthCSS from "./css/health.css";
 import progressCSS from "./css/progress.css";
@@ -47,6 +49,7 @@ export var damageSound;
 export var shrekSound;
 export var healSound;
 export var winSound;
+export var cardiBSound;
 export const sphereRestHeight = 0.5;
 export const bossRestHeight = 2.5;
 export var health;
@@ -55,6 +58,7 @@ var shadowMesh;
 const zeroShadowHeight = 8;
 var boss;
 export let LEVEL = 1;
+const MAXLEVEL = 5;
 const dt = 1 / 60;
 const camDistXZ = 5;
 const camHeightAbove = 2.7;
@@ -73,6 +77,7 @@ var planeMeshes = [],
   indigoViruses = [],
   yellowViruses = [],
   menu,
+  level,
   progress;
 var keys = [0, 0, 0, 0, 0]; // Up, Down, Left, Right, Jump!
 var date, pn, longWall1, longWall2, shortWall1, shortWall2;
@@ -145,7 +150,8 @@ function initCannon() {
 function init() {
   // Create various GUI elements.
   progress = new Progress();
-
+  level = new Level();
+  level.updateLabel();
   // Initialize core ThreeJS components
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera();
@@ -375,9 +381,17 @@ function animate() {
         progress.state != "gameover" &&
         progress.state != "win"
       ) {
-        menu.showWin();
-        winSound.play();
-        progress.state = "win";
+        if (LEVEL < MAXLEVEL) {
+          menu.showWin();
+          winSound.play();
+          progress.state = "win";
+        }
+        if (LEVEL == MAXLEVEL) {
+          shrekSound.pause();
+          menu.showFinalWin();
+          cardiBSound.play();
+          progress.state = "win";
+        }
       }
 
       // Game over ! :(
@@ -464,59 +478,51 @@ function animate() {
       progress = new Progress();
       progress.updateBar();
 
-      // Reset each virus
-      for (let i = 0; i < viruses.length; i++) {
-        var newVirusPos = new THREE.Vector3(
-          1 + Math.floor(Math.random() * width - 1),
-          virusProperties["LEVEL1"].radius,
-          1 + Math.floor((i * height) / viruses.length)
-        );
-        // Reset physics
-        viruses[i].body.position.set(
-          newVirusPos.x,
-          newVirusPos.y,
-          newVirusPos.z
-        );
-        viruses[i].body.velocity = new CANNON.Vec3(0, 0, 0);
-
-        // Reset rendering
-        viruses[i].mesh.position.set(
-          newVirusPos.x,
-          newVirusPos.y,
-          newVirusPos.z
-        );
-
-        // More random walking !
-        viruses[i].randomWalk();
-      }
-
       cleanViruses(bosses);
       cleanViruses(blueViruses);
       cleanViruses(indigoViruses);
       cleanViruses(yellowViruses);
+      if (LEVEL > MAXLEVEL) {
+        cleanViruses(viruses);
 
-      if (LEVEL == 2) {
-        addBosses("LEVEL2", 10, bosses);
+        if (upgrades.length) {
+          for (let i = 0; i < upgrades.length; i++) {
+            upgrades[i].mesh.geometry.dispose();
+            upgrades[i].mesh.material.dispose();
+            scene.remove(upgrades[i].mesh);
+            upgrades[i].mesh = undefined;
+            upgrades[i] = undefined;
+          }
+          upgrades.length = 0;
+        }
+
+        level.removeLabel();
+      } else {
+        resetBabyViruses(viruses);
+
+        if (LEVEL == 2) {
+          addBosses("LEVEL2", 10, bosses);
+        }
+
+        if (LEVEL == 3) {
+          addBosses("LEVEL2", 10, bosses);
+          addViruses("LEVEL3", 30, blueViruses);
+        }
+
+        if (LEVEL == 4) {
+          addBosses("LEVEL2", 10, bosses);
+          addViruses("LEVEL3", 50, blueViruses);
+          addBosses("LEVEL4", 40, indigoViruses);
+        }
+
+        if (LEVEL == 5) {
+          addBosses("LEVEL2", 10, bosses);
+          addViruses("LEVEL3", 50, blueViruses);
+          addBosses("LEVEL4", 40, indigoViruses);
+          addViruses("LEVEL5", 5, yellowViruses);
+        }
+        level.updateLabel();
       }
-
-      if (LEVEL == 3) {
-        addBosses("LEVEL2", 10, bosses);
-        addViruses("LEVEL3", 30, blueViruses);
-      }
-
-      if (LEVEL == 4) {
-        addBosses("LEVEL2", 10, bosses);
-        addViruses("LEVEL3", 50, blueViruses);
-        addBosses("LEVEL4", 40, indigoViruses);
-      }
-
-      if (LEVEL == 5) {
-        addBosses("LEVEL2", 10, bosses);
-        addViruses("LEVEL3", 50, blueViruses);
-        addBosses("LEVEL4", 40, indigoViruses);
-        addViruses("LEVEL5", 5, yellowViruses);
-      }
-
       state = "menu";
     }
   }
@@ -696,7 +702,7 @@ function registerListeners() {
           menu.startGame();
         }
         //
-        if (e.key === "l" && progress.state == "win") {
+        if (e.key === "l" && progress.state == "win" && LEVEL < MAXLEVEL) {
           LEVEL++;
           state = "reset";
         }
@@ -758,6 +764,12 @@ function addSounds() {
   winSound = new THREE.Audio(audioListener);
   soundLoader4.load("audio/win.mp3", function (audioBuffer) {
     winSound.setBuffer(audioBuffer);
+  });
+
+  let soundLoader5 = new THREE.AudioLoader();
+  cardiBSound = new THREE.Audio(audioListener);
+  soundLoader5.load("audio/cardiB.mp3", function (audioBuffer) {
+    cardiBSound.setBuffer(audioBuffer);
   });
 }
 
@@ -833,6 +845,26 @@ function updateViruses(viruses) {
       virus.mesh.quaternion.copy(virus.body.quaternion);
       updateCellsForParticle(virus.mesh);
     }
+  }
+}
+
+function resetBabyViruses(viruses) {
+  // Reset each virus
+  for (let i = 0; i < viruses.length; i++) {
+    var newVirusPos = new THREE.Vector3(
+      1 + Math.floor(Math.random() * width - 1),
+      virusProperties["LEVEL1"].radius,
+      1 + Math.floor((i * height) / viruses.length)
+    );
+    // Reset physics
+    viruses[i].body.position.set(newVirusPos.x, newVirusPos.y, newVirusPos.z);
+    viruses[i].body.velocity = new CANNON.Vec3(0, 0, 0);
+
+    // Reset rendering
+    viruses[i].mesh.position.set(newVirusPos.x, newVirusPos.y, newVirusPos.z);
+
+    // More random walking !
+    viruses[i].randomWalk();
   }
 }
 
