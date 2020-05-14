@@ -317,7 +317,6 @@ function init() {
   scene.add(sphereMesh);
   initialCellPos = new THREE.Vector3(width/2, sphereRestHeight + EPS, 2);
   sphereBody.position.set(initialCellPos.x, initialCellPos.y, initialCellPos.z);
-  debugger;
   sphereMesh.position.set(initialCellPos.x, initialCellPos.y, initialCellPos.z);
 
   // let loader = new OBJLoader();
