@@ -32,7 +32,7 @@ const organTexture = new THREE.TextureLoader().load(ORGAN);
 /***************************************************************************/
 /* CONSTANTS AND VARIABLES */
 
-const WINNINGSCORE = 10;
+const WINNINGSCORE = 99;
 export const EPS = 0.05;
 const impact = 10;
 const objScale = 0.05;
