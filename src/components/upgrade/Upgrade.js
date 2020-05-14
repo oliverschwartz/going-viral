@@ -3,7 +3,7 @@ import * as CANNON from "cannon";
 import * as APP from "../../app.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import SPRAY from "../../../glbs/spray.glb";
-import TOILET_ROLL from '../../../glbs/525 Toilet Roll.glb';
+import TOILET_ROLL from "../../../glbs/525 Toilet Roll.glb";
 
 class Upgrade {
   constructor(position, type) {
@@ -41,8 +41,8 @@ class Upgrade {
         mesh.scale.z = 0.03;
         mesh.geometry.center();
         mesh.material = new THREE.MeshPhongMaterial({
-          color: new THREE.Color("white")
-        })
+          color: new THREE.Color("white"),
+        });
         me.mesh = mesh;
         APP.scene.add(mesh);
       });

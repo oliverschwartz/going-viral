@@ -12,9 +12,11 @@
 }
 
 .win-title {
+  text-align: center;
   font-size: 10rem;
   -webkit-text-stroke: 2px black;
 }
 .win-text {
+  text-align: center;
   font-size: 2rem;
 }

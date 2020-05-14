@@ -74,6 +74,7 @@ module.exports = {
       objects$: path.resolve(__dirname, "src/components/objects"),
       scenes$: path.resolve(__dirname, "src/components/scenes"),
       perlin$: path.resolve(__dirname, "src/components/perlin"),
+      level$: path.resolve(__dirname, "src/components/level"),
     },
   },
   plugins: [
