@@ -314,8 +314,8 @@ function init() {
     new THREE.MeshPhongMaterial({ color: 0xffffff })
   );
   scene.add(sphereMesh);
-  sphereBody.position.set(0, sphereRestHeight + EPS, 0);
-  sphereMesh.position.set(0, sphereRestHeight + EPS, 0);
+  sphereBody.position.set(width / 2, sphereRestHeight + EPS, 3);
+  sphereMesh.position.set(width / 2, sphereRestHeight + EPS, 3);
 
   // let loader = new OBJLoader();
   let loader = new GLTFLoader();
@@ -324,7 +324,7 @@ function init() {
     sphereMesh = object.scene.children[0].children[0].clone();
     sphereMesh.geometry.scale(objScale, objScale, objScale);
     sphereMesh.geometry.center();
-    sphereMesh.position.set(0, sphereRestHeight + EPS, 0);
+    sphereMesh.position.set(width / 2, sphereRestHeight + EPS, 0);
     sphereMesh.material = new THREE.MeshLambertMaterial({ color: 0xd6d6d6 });
     scene.add(sphereMesh);
   });
