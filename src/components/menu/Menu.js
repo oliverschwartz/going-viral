@@ -7,6 +7,10 @@ const winTitle = $('<div class="win-title">YOU WIN!</div>');
 const winText = $(
   '<div class="win-text">Great work mate! Press "L" to move to the next level.</div>'
 );
+const finalWinTitle = $('<div class="win-title">YOU BEAT THE GAME!</div>');
+const finalWinText = $(
+  '<div class="win-text">Congratulations beast. You have now officially gone viral!</div>'
+);
 
 class Menu {
   constructor() {
@@ -43,6 +47,11 @@ class Menu {
   showWin() {
     winTitle.appendTo(".win");
     winText.appendTo(".win");
+  }
+
+  showFinalWin() {
+    finalWinTitle.appendTo(".win");
+    finalWinText.appendTo(".win");
   }
 
   clearWin() {

@@ -1,15 +1,16 @@
 import * as THREE from "three";
 import * as CANNON from "cannon";
+import * as MENU from "menu";
 import { BasicLights } from "lights";
 import { updateCellsForParticle, resetRender } from "./updateRender.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { Virus } from "virus";
 import { Boss } from "boss";
-import * as MENU from "menu";
 import { Health } from "health";
 import { Progress } from "progress";
 import { Upgrade } from "upgrade";
 import { Perlin } from "perlin";
+import { Level } from "level";
 
 import ORGAN from "../assets/organ.jpg";
 import BACKGROUND from "../assets/bg.jpg";
@@ -17,6 +18,14 @@ import ROUNDSHADOW from "../assets/roundshadow.png";
 
 import WHITECELLOBJ from "../glbs/1408 White Blood Cell.glb";
 
+// sounds
+import DAMAGESOUND from "../audio/damage.mp3";
+import SHREKSOUND from "../audio/shreksophone.mp3";
+import HEALSOUND from "../audio/heal.mp3";
+import WINSOUND from "../audio/win.mp3";
+import CARDIB from "../audio/cardiB.mp3";
+
+import levelCSS from "./css/level.css";
 import menuCSS from "./css/menu.css";
 import healthCSS from "./css/health.css";
 import progressCSS from "./css/progress.css";
@@ -32,11 +41,7 @@ const organTexture = new THREE.TextureLoader().load(ORGAN);
 /***************************************************************************/
 /* CONSTANTS AND VARIABLES */
 
-const WINNINGSCORE = 99;
 export const EPS = 0.05;
-const impact = 10;
-const objScale = 0.05;
-const NUM_UPGRADES = 10;
 export const width = 20;
 export const height = 1000;
 export const planeRad = 1;
@@ -47,22 +52,29 @@ export var damageSound;
 export var shrekSound;
 export var healSound;
 export var winSound;
+export var cardiBSound;
 export const sphereRestHeight = 0.5;
 export const bossRestHeight = 2.5;
 export var health;
-var upgrades = [];
-var shadowMesh;
-const zeroShadowHeight = 8;
-var boss;
 export let LEVEL = 1;
+export var sphereBody;
+const WINNINGSCORE = 99;
+const impact = 10;
+const objScale = 0.05;
+const NUM_UPGRADES = 10;
+const zeroShadowHeight = 8;
+const MAXLEVEL = 5;
 const dt = 1 / 60;
 const camDistXZ = 5;
 const camHeightAbove = 2.7;
 const angle = (3 * Math.PI) / 180;
+var upgrades = [];
+var shadowMesh;
+var boss;
 var world;
-var controls, renderer, scene, camera;
-export var sphereBody;
-var planeMeshes = [],
+var renderer, scene, camera;
+var initialCellPos,
+  planeMeshes = [],
   sphereMesh,
   sphereRad,
   sphereDir,
@@ -73,6 +85,7 @@ var planeMeshes = [],
   indigoViruses = [],
   yellowViruses = [],
   menu,
+  level,
   progress;
 var keys = [0, 0, 0, 0, 0]; // Up, Down, Left, Right, Jump!
 var date, pn, longWall1, longWall2, shortWall1, shortWall2;
@@ -145,14 +158,15 @@ function initCannon() {
 function init() {
   // Create various GUI elements.
   progress = new Progress();
-
+  level = new Level();
+  level.updateLabel();
   // Initialize core ThreeJS components
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera();
   renderer = new THREE.WebGLRenderer({ antialias: true });
 
   // Add some sound.
-  addSounds();
+  // addSounds();
 
   // Add some upgrades.
   const types = ["toilet_roll", "spray"];
@@ -293,7 +307,7 @@ function init() {
 
   // Create a sphere.
   sphereRad = 0.5;
-  sphereDir = new THREE.Vector3(1, 0, 0);
+  sphereDir = new THREE.Vector3(0, 0, 1); // Initialize cell to look forward
   let sphereShape = new CANNON.Sphere(sphereRad);
   sphereBody = new CANNON.Body({
     mass: 1,
@@ -308,8 +322,9 @@ function init() {
     new THREE.MeshPhongMaterial({ color: 0xffffff })
   );
   scene.add(sphereMesh);
-  sphereBody.position.set(0, sphereRestHeight + EPS, 0);
-  sphereMesh.position.set(0, sphereRestHeight + EPS, 0);
+  initialCellPos = new THREE.Vector3(width/2, sphereRestHeight + EPS, 2);
+  sphereBody.position.set(initialCellPos.x, initialCellPos.y, initialCellPos.z);
+  sphereMesh.position.set(initialCellPos.x, initialCellPos.y, initialCellPos.z);
 
   // let loader = new OBJLoader();
   let loader = new GLTFLoader();
@@ -318,7 +333,7 @@ function init() {
     sphereMesh = object.scene.children[0].children[0].clone();
     sphereMesh.geometry.scale(objScale, objScale, objScale);
     sphereMesh.geometry.center();
-    sphereMesh.position.set(0, sphereRestHeight + EPS, 0);
+    sphereMesh.position.set(initialCellPos.x, initialCellPos.y, initialCellPos.z);
     sphereMesh.material = new THREE.MeshLambertMaterial({ color: 0xd6d6d6 });
     scene.add(sphereMesh);
   });
@@ -347,6 +362,7 @@ function init() {
     }
   });
 
+  // Add level 1 viruses 
   addViruses("LEVEL1", 80, viruses);
 
   // Go to menu
@@ -359,12 +375,20 @@ function animate() {
     case "menu": {
       menu = new MENU.Menu();
       if (menu.newState == "play") {
+        if (shrekSound == null) addSounds();
+        // else if (!shrekSound.isPlaying) shrekSound.play();
         state = menu.newState;
+        // if (shrekSound != null) {
+        // if (!shrekSound.isPlaying) 
+        //   shrekSound.play();
+        // }
+        // else addSounds(); 
       }
       break;
     }
 
     case "play": {
+      // console.log(shrekSound.isPlaying);
       // initialize Health if starting game
       if (health == null) health = new Health();
 
@@ -374,9 +398,17 @@ function animate() {
         progress.state != "gameover" &&
         progress.state != "win"
       ) {
-        menu.showWin();
-        winSound.play();
-        progress.state = "win";
+        if (LEVEL < MAXLEVEL) {
+          menu.showWin();
+          winSound.play();
+          progress.state = "win";
+        }
+        if (LEVEL == MAXLEVEL) {
+          shrekSound.pause();
+          menu.showFinalWin();
+          cardiBSound.play();
+          progress.state = "win";
+        }
       }
 
       // Game over ! :(
@@ -387,6 +419,7 @@ function animate() {
       ) {
         progress.state = "gameover";
         menu.showGameover();
+        
       }
 
       // update Cannon world
@@ -438,6 +471,9 @@ function animate() {
     }
 
     case "reset": {
+      // pause bg music if playing
+      // if (shrekSound != null) shrekSound.pause();
+
       if (progress.state == "gameover") {
         LEVEL = 1;
       }
@@ -451,10 +487,11 @@ function animate() {
       }
 
       // Reset physics of sphere
-      sphereBody.position.set(0, sphereRestHeight + EPS, 0);
+      sphereBody.position.set(initialCellPos.x, initialCellPos.y, initialCellPos.z);
       sphereBody.velocity = new CANNON.Vec3(0, 0, 0);
       // Reset rendering of sphere
-      sphereMesh.position.set(0, sphereRestHeight + EPS, 0);
+      sphereMesh.position.set(initialCellPos.x, initialCellPos.y, initialCellPos.z);
+      sphereDir = new THREE.Vector3(0, 0, 1);
 
       // Reset health and progress
       health = new Health();
@@ -463,59 +500,51 @@ function animate() {
       progress = new Progress();
       progress.updateBar();
 
-      // Reset each virus
-      for (let i = 0; i < viruses.length; i++) {
-        var newVirusPos = new THREE.Vector3(
-          1 + Math.floor(Math.random() * width - 1),
-          virusProperties["LEVEL1"].radius,
-          1 + Math.floor((i * height) / viruses.length)
-        );
-        // Reset physics
-        viruses[i].body.position.set(
-          newVirusPos.x,
-          newVirusPos.y,
-          newVirusPos.z
-        );
-        viruses[i].body.velocity = new CANNON.Vec3(0, 0, 0);
-
-        // Reset rendering
-        viruses[i].mesh.position.set(
-          newVirusPos.x,
-          newVirusPos.y,
-          newVirusPos.z
-        );
-
-        // More random walking !
-        viruses[i].randomWalk();
-      }
-
       cleanViruses(bosses);
       cleanViruses(blueViruses);
       cleanViruses(indigoViruses);
       cleanViruses(yellowViruses);
+      if (LEVEL > MAXLEVEL) {
+        cleanViruses(viruses);
 
-      if (LEVEL == 2) {
-        addBosses("LEVEL2", 10, bosses);
+        if (upgrades.length) {
+          for (let i = 0; i < upgrades.length; i++) {
+            upgrades[i].mesh.geometry.dispose();
+            upgrades[i].mesh.material.dispose();
+            scene.remove(upgrades[i].mesh);
+            upgrades[i].mesh = undefined;
+            upgrades[i] = undefined;
+          }
+          upgrades.length = 0;
+        }
+
+        level.removeLabel();
+      } else {
+        resetBabyViruses(viruses);
+
+        if (LEVEL == 2) {
+          addBosses("LEVEL2", 10, bosses);
+        }
+
+        if (LEVEL == 3) {
+          addBosses("LEVEL2", 10, bosses);
+          addViruses("LEVEL3", 30, blueViruses);
+        }
+
+        if (LEVEL == 4) {
+          addBosses("LEVEL2", 10, bosses);
+          addViruses("LEVEL3", 50, blueViruses);
+          addBosses("LEVEL4", 40, indigoViruses);
+        }
+
+        if (LEVEL == 5) {
+          addBosses("LEVEL2", 10, bosses);
+          addViruses("LEVEL3", 50, blueViruses);
+          addBosses("LEVEL4", 40, indigoViruses);
+          addViruses("LEVEL5", 5, yellowViruses);
+        }
+        level.updateLabel();
       }
-
-      if (LEVEL == 3) {
-        addBosses("LEVEL2", 10, bosses);
-        addViruses("LEVEL3", 30, blueViruses);
-      }
-
-      if (LEVEL == 4) {
-        addBosses("LEVEL2", 10, bosses);
-        addViruses("LEVEL3", 50, blueViruses);
-        addBosses("LEVEL4", 40, indigoViruses);
-      }
-
-      if (LEVEL == 5) {
-        addBosses("LEVEL2", 10, bosses);
-        addViruses("LEVEL3", 50, blueViruses);
-        addBosses("LEVEL4", 40, indigoViruses);
-        addViruses("LEVEL5", 5, yellowViruses);
-      }
-
       state = "menu";
     }
   }
@@ -695,7 +724,7 @@ function registerListeners() {
           menu.startGame();
         }
         //
-        if (e.key === "l" && progress.state == "win") {
+        if (e.key === "l" && progress.state == "win" && LEVEL < MAXLEVEL) {
           LEVEL++;
           state = "reset";
         }
@@ -732,31 +761,41 @@ function addSounds() {
   let audioListener = new THREE.AudioListener();
   camera.add(audioListener);
 
+  let soundLoader2 = new THREE.AudioLoader();
+  if (shrekSound == null) {
+    shrekSound = new THREE.Audio(audioListener);
+    soundLoader2.load(SHREKSOUND, function (audioBuffer) {
+      shrekSound.setBuffer(audioBuffer);
+      shrekSound.setLoop(true);
+      shrekSound.setVolume(0.5);
+      shrekSound.play();
+      shrekSound.isPlaying = true;
+    });
+  }
+
   damageSound = new THREE.Audio(audioListener);
   let soundLoader1 = new THREE.AudioLoader();
-  soundLoader1.load("audio/damage.mp3", function (audioBuffer) {
+  soundLoader1.load(DAMAGESOUND, function (audioBuffer) {
     damageSound.setBuffer(audioBuffer);
-  });
-
-  let soundLoader2 = new THREE.AudioLoader();
-  shrekSound = new THREE.Audio(audioListener);
-  soundLoader2.load("audio/shreksophone.mp3", function (audioBuffer) {
-    shrekSound.setBuffer(audioBuffer);
-    shrekSound.setLoop(true);
-    shrekSound.setVolume(0.5);
-    shrekSound.play();
+    damageSound.isPlaying = false;
   });
 
   let soundLoader3 = new THREE.AudioLoader();
   healSound = new THREE.Audio(audioListener);
-  soundLoader3.load("audio/heal.mp3", function (audioBuffer) {
+  soundLoader3.load(HEALSOUND, function (audioBuffer) {
     healSound.setBuffer(audioBuffer);
   });
 
   let soundLoader4 = new THREE.AudioLoader();
   winSound = new THREE.Audio(audioListener);
-  soundLoader4.load("audio/win.mp3", function (audioBuffer) {
+  soundLoader4.load(WINSOUND, function (audioBuffer) {
     winSound.setBuffer(audioBuffer);
+  });
+
+  let soundLoader5 = new THREE.AudioLoader();
+  cardiBSound = new THREE.Audio(audioListener);
+  soundLoader5.load(CARDIB, function (audioBuffer) {
+    cardiBSound.setBuffer(audioBuffer);
   });
 }
 
@@ -832,6 +871,26 @@ function updateViruses(viruses) {
       virus.mesh.quaternion.copy(virus.body.quaternion);
       updateCellsForParticle(virus.mesh);
     }
+  }
+}
+
+function resetBabyViruses(viruses) {
+  // Reset each virus
+  for (let i = 0; i < viruses.length; i++) {
+    var newVirusPos = new THREE.Vector3(
+      1 + Math.floor(Math.random() * width - 1),
+      virusProperties["LEVEL1"].radius,
+      15 + Math.floor((i * height) / viruses.length)
+    );
+    // Reset physics
+    viruses[i].body.position.set(newVirusPos.x, newVirusPos.y, newVirusPos.z);
+    viruses[i].body.velocity = new CANNON.Vec3(0, 0, 0);
+
+    // Reset rendering
+    viruses[i].mesh.position.set(newVirusPos.x, newVirusPos.y, newVirusPos.z);
+
+    // More random walking !
+    viruses[i].randomWalk();
   }
 }
 

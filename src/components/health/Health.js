@@ -11,7 +11,8 @@ class Health {
   }
 
   takeDamage(damage) {
-    APP.damageSound.play();
+    if (!APP.damageSound.isPlaying)
+      APP.damageSound.play();
     $(".health-bar-red, .health-bar").stop();
     this.curHealth = this.curHealth - damage;
     if (this.curHealth < 0) {
