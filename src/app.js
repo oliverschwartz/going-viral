@@ -376,7 +376,7 @@ function animate() {
       menu = new MENU.Menu();
       if (menu.newState == "play") {
         if (shrekSound == null) addSounds();
-        if (!shrekSound.isPlaying) shrekSound.play();
+        // else if (!shrekSound.isPlaying) shrekSound.play();
         state = menu.newState;
         // if (shrekSound != null) {
         // if (!shrekSound.isPlaying) 
@@ -472,7 +472,7 @@ function animate() {
 
     case "reset": {
       // pause bg music if playing
-      if (shrekSound != null) shrekSound.pause();
+      // if (shrekSound != null) shrekSound.pause();
 
       if (progress.state == "gameover") {
         LEVEL = 1;
