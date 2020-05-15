@@ -376,6 +376,7 @@ function animate() {
       menu = new MENU.Menu();
       if (menu.newState == "play") {
         state = menu.newState;
+        if (shrekSound != null) shrekSound.pause();
         addSounds(); 
       }
       break;
@@ -412,6 +413,7 @@ function animate() {
       ) {
         progress.state = "gameover";
         menu.showGameover();
+        
       }
 
       // update Cannon world
@@ -750,19 +752,22 @@ function addSounds() {
   let audioListener = new THREE.AudioListener();
   camera.add(audioListener);
 
+  let soundLoader2 = new THREE.AudioLoader();
+  if (shrekSound == null) {
+    shrekSound = new THREE.Audio(audioListener);
+    soundLoader2.load(SHREKSOUND, function (audioBuffer) {
+      shrekSound.setBuffer(audioBuffer);
+      shrekSound.setLoop(true);
+      shrekSound.setVolume(0.5);
+      shrekSound.play();
+    });
+  }
+  else shrekSound.play();
+
   damageSound = new THREE.Audio(audioListener);
   let soundLoader1 = new THREE.AudioLoader();
   soundLoader1.load(DAMAGESOUND, function (audioBuffer) {
     damageSound.setBuffer(audioBuffer);
-  });
-
-  let soundLoader2 = new THREE.AudioLoader();
-  shrekSound = new THREE.Audio(audioListener);
-  soundLoader2.load(SHREKSOUND, function (audioBuffer) {
-    shrekSound.setBuffer(audioBuffer);
-    shrekSound.setLoop(true);
-    shrekSound.setVolume(0.5);
-    shrekSound.play();
   });
 
   let soundLoader3 = new THREE.AudioLoader();
