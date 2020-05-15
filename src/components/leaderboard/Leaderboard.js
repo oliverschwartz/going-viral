@@ -18,8 +18,20 @@ class Leaderboard {
     firebase.initializeApp(firebaseConfig);
     firebase.analytics();
     var database = firebase.database();
-    database.ref('hello/').set(2); 
 
+    // Get the top 10 scores. 
+    let scoresRef = database.ref('scores').orderByChild('score').limitToLast(10);
+    let scores = []; 
+    scoresRef.once('value', function(snapshot) {
+      snapshot.forEach(function(child) {
+        scores.push(child);
+      });
+
+      // Display them in the leaderboard. 
+      scores.reverse().forEach(function(obj) {
+        $('#leaderboardTable tr:last').after('<tr><td>' + obj.key + '</td><td>' + obj.val()['score'] + '</td></tr>');
+      })
+    });
   }
 }
 
