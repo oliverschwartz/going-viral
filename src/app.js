@@ -375,14 +375,19 @@ function animate() {
     case "menu": {
       menu = new MENU.Menu();
       if (menu.newState == "play") {
+        if (shrekSound == null) addSounds();
         state = menu.newState;
-        if (shrekSound != null) shrekSound.pause();
-        addSounds(); 
+        // if (shrekSound != null) {
+        // if (!shrekSound.isPlaying) 
+        //   shrekSound.play();
+        // }
+        // else addSounds(); 
       }
       break;
     }
 
     case "play": {
+      // console.log(shrekSound.isPlaying);
       // initialize Health if starting game
       if (health == null) health = new Health();
 
@@ -763,14 +768,15 @@ function addSounds() {
       shrekSound.setLoop(true);
       shrekSound.setVolume(0.5);
       shrekSound.play();
+      shrekSound.isPlaying = true;
     });
   }
-  else shrekSound.play();
 
   damageSound = new THREE.Audio(audioListener);
   let soundLoader1 = new THREE.AudioLoader();
   soundLoader1.load(DAMAGESOUND, function (audioBuffer) {
     damageSound.setBuffer(audioBuffer);
+    damageSound.isPlaying = false;
   });
 
   let soundLoader3 = new THREE.AudioLoader();
