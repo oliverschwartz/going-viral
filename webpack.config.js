@@ -64,6 +64,7 @@ module.exports = {
   },
   resolve: {
     alias: {
+      leaderboard$: path.resolve(__dirname, "src/components/leaderboard"),
       progress$: path.resolve(__dirname, "src/components/progress"),
       health$: path.resolve(__dirname, "src/components/health"),
       menu$: path.resolve(__dirname, "src/components/menu"),

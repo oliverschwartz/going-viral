@@ -11,6 +11,9 @@ import { Progress } from "progress";
 import { Upgrade } from "upgrade";
 import { Perlin } from "perlin";
 import { Level } from "level";
+import { Leaderboard } from "leaderboard";
+
+var leaderboard = new Leaderboard();
 
 import ORGAN from "../assets/organ.jpg";
 import BACKGROUND from "../assets/bg.jpg";
