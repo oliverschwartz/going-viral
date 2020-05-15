@@ -465,6 +465,9 @@ function animate() {
     }
 
     case "reset": {
+      // pause bg music if playing
+      if (shrekSound != null) shrekSound.pause();
+
       if (progress.state == "gameover") {
         LEVEL = 1;
       }
