@@ -376,6 +376,7 @@ function animate() {
       menu = new MENU.Menu();
       if (menu.newState == "play") {
         if (shrekSound == null) addSounds();
+        if (!shrekSound.isPlaying) shrekSound.play();
         state = menu.newState;
         // if (shrekSound != null) {
         // if (!shrekSound.isPlaying) 
