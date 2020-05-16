@@ -100,7 +100,19 @@ h2 {
   border: 0px;
 }
 
+#leaderboard_btn {
+  color: #5add61;
+  background-color: #a8a7a500;
+  border: 0px;
+}
+
 #instructions_btn:hover {
+  color: #3a9140;
+  background-color: #a8a7a500;
+  border: 0px;
+}
+
+#leaderboard_btn:hover {
   color: #3a9140;
   background-color: #a8a7a500;
   border: 0px;
